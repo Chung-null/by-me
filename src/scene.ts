@@ -93,6 +93,6 @@ export function makeFPS(): void {
 }
 
 export const canvas = createCanvas()
-export const engine = new Engine(canvas, true)
+export const engine = new Engine(canvas, true);
 export const scene = makeScene()
 export const camera = createCamera
