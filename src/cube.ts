@@ -9,7 +9,7 @@ import { ground } from './ground';
 export async function makeCube(): Promise<Mesh> {
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#52"); //L91IFF#52, L91IFF#53
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#54"); //L91IFF#54, L91IFF#53
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -41,7 +41,7 @@ export async function makeCube(): Promise<Mesh> {
     btncloseshelf.onPointerUpObservable.add(() => {
         shelfWareInfo.isVisible = false;
         buttonShelfware.isVisible = true;
-    }); 
+    });
 
 
     var startingPoint;

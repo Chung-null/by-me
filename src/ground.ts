@@ -1,7 +1,5 @@
 import { Color3, CubeTexture, Mesh, MeshBuilder, PhysicsImpostor, StandardMaterial, Texture, Vector3 } from '@babylonjs/core'
 import { scene } from './scene'
-import * as GUI from "@babylonjs/gui";
-import { AdvancedDynamicTexture, Button, Control, TextBlock, InputText, Rectangle, StackPanel, RadioGroup, SelectionPanel } from "@babylonjs/gui"
 
 export function makeGround(): void {
     const groundMaterial = new StandardMaterial("groundMaterial", scene);
