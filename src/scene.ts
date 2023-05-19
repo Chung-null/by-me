@@ -78,9 +78,9 @@ export function makeFPS(): void {
     textBlock.fontSize = 50;
     ui.addControl(textBlock);
     textBlock.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-    textBlock.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    textBlock.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
     textBlock.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-    textBlock.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    textBlock.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
 
     const perfMonitor = new PerformanceMonitor();
     perfMonitor.enable();
@@ -88,7 +88,7 @@ export function makeFPS(): void {
     // Update the text block with the average FPS every frame
     scene.onBeforeRenderObservable.add(() => {
         perfMonitor.sampleFrame();
-        textBlock.text = `${perfMonitor.averageFPS.toFixed(0)} Fbs`;
+        textBlock.text = `${perfMonitor.averageFPS.toFixed(0)} Fps`;
     });
 }
 

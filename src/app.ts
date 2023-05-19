@@ -1,7 +1,7 @@
 import { AmmoJSPlugin, Vector3 } from '@babylonjs/core'
 import Ammo from 'ammojs-typed'
 import { scene, engine, makeFPS } from './scene'
-import { makeGround} from './ground'
+import { makeGround } from './ground'
 import { makeCube } from './cube'
 import { makeSky } from './skybox'
 

@@ -9,13 +9,40 @@ import { ground } from './ground';
 export async function makeCube(): Promise<Mesh> {
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#35"); //L91IFF#35
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#52"); //L91IFF#52, L91IFF#53
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
+    //Close all
+    let warehouseInfo = advancedTexture.getControlByName("WarehouseInfo");
+    warehouseInfo.isVisible = false;
+    let conveyorbeltInfo = advancedTexture.getControlByName("ConveyorbeltInfo");
+    conveyorbeltInfo.isVisible = false;
+    let boxInfo = advancedTexture.getControlByName("BoxInfo");
+    boxInfo.isVisible = false;
+    let palletInfo = advancedTexture.getControlByName("PalletInfo");
+    palletInfo.isVisible = false;
 
-    let btnadd = advancedTexture.getControlByName("BtnAdd");
-    let btndelete = advancedTexture.getControlByName("BtnDelete");
-    let btnedit = advancedTexture.getControlByName("BtnEdit");
+
+    //Event click button Shelfinfo
+    let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
+    shelfWareInfo.isVisible = false;
+
+    let buttonShelfware = advancedTexture.getControlByName("ButtonShelfware");
+    buttonShelfware.onPointerClickObservable.add(() => {
+        shelfWareInfo.isVisible = true;
+        buttonShelfware.isVisible = true;
+    });
+
+    let btnaddshelf = advancedTexture.getControlByName("BtnAddShelf");
+    let btndeleteshelf = advancedTexture.getControlByName("BtnDeleteShelf");
+    let btneditshelf = advancedTexture.getControlByName("BtnEditShelf");
+    let btncloseshelf = advancedTexture.getControlByName("BtnCloseShelf");
+
+    btncloseshelf.onPointerUpObservable.add(() => {
+        shelfWareInfo.isVisible = false;
+        buttonShelfware.isVisible = true;
+    }); 
+
 
     var startingPoint;
     var currentMesh;
@@ -102,7 +129,7 @@ export async function makeCube(): Promise<Mesh> {
     var meshes = [];
 
     // Add an event listener to the button
-    btnadd.onPointerClickObservable.add(async () => {
+    btnaddshelf.onPointerClickObservable.add(async () => {
         // Import the mesh
         const result = await SceneLoader.ImportMeshAsync(null, "shelf/", "shelfware.glb", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
@@ -121,7 +148,7 @@ export async function makeCube(): Promise<Mesh> {
         meshes.push(meshs);
         // console.log("mesh button " + meshes.length);
     });
-    btnedit.onPointerClickObservable.add(() => {
+    btneditshelf.onPointerClickObservable.add(() => {
         // Initialize GizmoManager
         var gizmoManager = new GizmoManager(scene)
         gizmoManager.boundingBoxGizmoEnabled = true
@@ -144,7 +171,7 @@ export async function makeCube(): Promise<Mesh> {
         }
     })
     // delete selected meshes
-    btndelete.onPointerClickObservable.add(() => {
+    btndeleteshelf.onPointerClickObservable.add(() => {
         if (currentMesh != null) {
             currentMesh.dispose();
             currentMesh = null;
