@@ -5,6 +5,8 @@ import { makeGround } from './ground'
 import { makeCube } from './cube'
 import { makeSky } from './skybox'
 import { makeWare } from './warehouse'
+import { makeBox } from './box'
+import { makePallet } from './pallet'
 
 async function main(): Promise<void> {
     const ammo = await Ammo()
@@ -16,6 +18,8 @@ async function main(): Promise<void> {
     makeSky()
     makeFPS()
     makeWare()
+    makeBox()
+    makePallet()
     // run the main render loop
     engine.runRenderLoop(() => scene.render())
 }
