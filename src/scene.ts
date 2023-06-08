@@ -11,13 +11,13 @@ import {
 } from '@babylonjs/core'
 import { AdvancedDynamicTexture, Control, TextBlock } from '@babylonjs/gui';
 
-function createCamera(canvas: HTMLCanvasElement, scene: Scene): Camera {
+function createCamera(scene:Scene): Camera {
     const camera = new ArcRotateCamera('Camera', -Math.PI / 2, Math.PI / 2.5, 15, new Vector3(0, 0, 0), scene)
     scene.activeCamera = camera;
     scene.activeCamera.attachControl(canvas, true);
-    camera.upperBetaLimit = Math.PI / 2.3;
-    camera.lowerRadiusLimit = 10;
-    camera.upperRadiusLimit = 150;
+    // camera.upperBetaLimit = Math.PI / 2.3;
+    // camera.lowerRadiusLimit = 10;
+    // camera.upperRadiusLimit = 150;
 
     document.documentElement.style["overflow"] = "hidden";
     document.documentElement.style.overflow = "hidden";
@@ -61,7 +61,7 @@ function createCanvas() {
 
 function makeScene(): Scene {
     const scene = new Scene(engine)
-    createCamera(canvas, scene)
+    createCamera(scene)
     createLight(scene)
     setBackground(scene)
 
@@ -95,4 +95,4 @@ export function makeFPS(): void {
 export const canvas = createCanvas()
 export const engine = new Engine(canvas, true);
 export const scene = makeScene()
-export const camera = createCamera
+export const camera = createCamera(scene)

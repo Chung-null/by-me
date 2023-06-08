@@ -9,7 +9,7 @@ import { ground } from './ground';
 export async function makePallet(): Promise<Mesh> {
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#54"); //L91IFF#54, L91IFF#53
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#69"); //L91IFF#64, L91IFF#69
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -21,8 +21,12 @@ export async function makePallet(): Promise<Mesh> {
     boxInfo.isVisible = false;
     let palletInfo = advancedTexture.getControlByName("PalletInfo");
     palletInfo.isVisible = false;
-    let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
-    shelfWareInfo.isVisible = false;
+    let location = advancedTexture.getControlByName("Location");
+    location.isVisible = false;
+    let listMenuShelf = advancedTexture.getControlByName("ListMenuShelf");
+    listMenuShelf.isVisible = false;
+     let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
+     shelfWareInfo.isVisible = false;
 
 
 
@@ -131,7 +135,7 @@ export async function makePallet(): Promise<Mesh> {
     // Add an event listener to the button
     btnaddpallet.onPointerClickObservable.add(async () => {
         // Import the pallet
-        const result = await SceneLoader.ImportMeshAsync(null, "pallet/", "pallet.glb", scene, function (container) {
+        const result = await SceneLoader.ImportMeshAsync(null, "pallet/", "palleteton.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
         pallet = result.meshes[0];
