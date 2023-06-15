@@ -9,7 +9,7 @@ import { ground } from './ground';
 export async function makeConveyor(): Promise<Mesh> {
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#69"); //L91IFF#64, L91IFF#69
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#82"); //L91IFF#73, L91IFF#76, L91IFF#75
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -25,8 +25,13 @@ export async function makeConveyor(): Promise<Mesh> {
     location.isVisible = false;
     let listMenuShelf = advancedTexture.getControlByName("ListMenuShelf");
     listMenuShelf.isVisible = false;
-     let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
-     shelfWareInfo.isVisible = false;
+    let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
+    shelfWareInfo.isVisible = false;
+    let infomationinfobox = advancedTexture.getControlByName("InformationInfoBox");
+    infomationinfobox.isVisible = false;
+    let infomationinfoshelf = advancedTexture.getControlByName("InformationInfoShelf");
+    infomationinfoshelf.isVisible = false;
+
 
 
 
@@ -135,7 +140,7 @@ export async function makeConveyor(): Promise<Mesh> {
     // Add an event listener to the button
     btnaddconve.onPointerClickObservable.add(async () => {
         // Import the conveyor
-        const result = await SceneLoader.ImportMeshAsync(null, "conveyor/", "conveyor.glb", scene, function (container) {
+        const result = await SceneLoader.ImportMeshAsync(null, "conveyor/", "conveyor.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
         conveyor = result.meshes[0];

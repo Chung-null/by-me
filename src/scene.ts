@@ -12,7 +12,7 @@ import {
 import { AdvancedDynamicTexture, Control, TextBlock } from '@babylonjs/gui';
 
 function createCamera(scene:Scene): Camera {
-    const camera = new ArcRotateCamera('Camera', -Math.PI / 2, Math.PI / 2.5, 15, new Vector3(0, 0, 0), scene)
+    const camera = new ArcRotateCamera('Camera', -Math.PI / 2, Math.PI / 2.5, 100, new Vector3(0, 0, 0), scene)
     scene.activeCamera = camera;
     scene.activeCamera.attachControl(canvas, true);
     // camera.upperBetaLimit = Math.PI / 2.3;

@@ -3,13 +3,22 @@ import { scene, engine, camera, canvas } from './scene'
 import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
+import { handlers } from './mockapi/handlers';
+import { InputText } from '@babylonjs/gui';
 
 
 
 export async function makeBox(): Promise<Mesh> {
+    var startingBox;
+    var currentBox;
+    var outlinebox;
+    var position = 1;
+    var box;
+    var boxes = [];
+    var apiBox = new handlers();
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#69"); //L91IFF#64, L91IFF#69
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#82"); //L91IFF#73, L91IFF#76, L91IFF#75
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -25,9 +34,12 @@ export async function makeBox(): Promise<Mesh> {
     location.isVisible = false;
     let listMenuShelf = advancedTexture.getControlByName("ListMenuShelf");
     listMenuShelf.isVisible = false;
-     let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
-     shelfWareInfo.isVisible = false;
-
+    let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
+    shelfWareInfo.isVisible = false;
+    let infomationinfobox = advancedTexture.getControlByName("InformationInfoBox");
+    infomationinfobox.isVisible = false;
+    let infomationinfoshelf = advancedTexture.getControlByName("InformationInfoShelf");
+    infomationinfoshelf.isVisible = false;
 
     //Event click button Shelfinfo
     let buttonBox = advancedTexture.getControlByName("ButtonBox");
@@ -40,16 +52,22 @@ export async function makeBox(): Promise<Mesh> {
     let btndeletebox = advancedTexture.getControlByName("BtnDeleteBox");
     let btneditbox = advancedTexture.getControlByName("BtnEditBox");
     let btnclosebox = advancedTexture.getControlByName("BtnCloseBox");
+    let btnsaveinfobox = advancedTexture.getControlByName("ButtonSaveInfobox");
+    //Get Info Box
+    let txtBoxNameInfo = <InputText>advancedTexture.getControlByName("InputNameBoxinfo");
+    let txtImportInfo = <InputText>advancedTexture.getControlByName("InputImportBoxinfo");
+    let txtExportInfo = <InputText>advancedTexture.getControlByName("InputExportBoxinfo");
+    //Khai báo
+    let addNameBox;
+    let addImportBox;
+    let addExportBox;
+
 
     btnclosebox.onPointerUpObservable.add(() => {
         boxInfo.isVisible = false;
         buttonBox.isVisible = true;
     });
 
-
-    var startingBox;
-    var currentBox;
-    var outlinebox;
     var getGroundPosition = function () {
         var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (box) { return box == ground; });
         if (pickinfo.hit) {
@@ -64,6 +82,10 @@ export async function makeBox(): Promise<Mesh> {
             // outlinebox
             outlinebox = currentBox;
             outlinebox.renderOutline = false;
+            infomationinfobox.isVisible = false;
+            txtBoxNameInfo.text = "";
+            txtImportInfo.text = "";
+            txtExportInfo.text = "";
         }
 
         currentBox = box;
@@ -90,7 +112,11 @@ export async function makeBox(): Promise<Mesh> {
             // // outlinebox
             // outlinebox = currentBox;
             // outlinebox.renderOutline = false;
-            // camera.attachControl(canvas, true);
+            camera.attachControl(canvas, true);
+            infomationinfobox.isVisible = true;
+            txtBoxNameInfo.text = addNameBox.toString()
+            txtImportInfo.text = addImportBox.toString()
+            txtExportInfo.text = addExportBox.toString()
             startingBox = null;
             return;
         }
@@ -115,8 +141,34 @@ export async function makeBox(): Promise<Mesh> {
             case PointerEventTypes.POINTERDOWN:
 
                 if (pointerInfo.pickInfo.hit && pointerInfo.pickInfo.pickedMesh != ground) {
-                    pointerDown(pointerInfo.pickInfo.pickedMesh)
+                    pointerDown(pointerInfo.pickInfo.pickedMesh);
+
                 }
+                else if (pointerInfo.pickInfo.pickedMesh == ground) {
+                    if (currentBox) {
+                        // currentMesh.material.wireframe = false;
+                        // outline
+                        outlinebox = currentBox;
+                        outlinebox.renderOutline = false;
+                        infomationinfobox.isVisible = false;
+                        txtBoxNameInfo.text = "";
+                        txtImportInfo.text = "";
+                        txtExportInfo.text = "";
+
+                    }
+                    // console.log("down");
+                }
+                else if (pointerInfo.pickInfo.pickedMesh == ground && pointerInfo.event.button == 0) {
+                    var vector = pointerInfo.pickInfo.pickedPoint;
+                    console.log('left mouse click: ' + vector.x + ',' + vector.y + ',' + vector.z);
+                }
+                else if (pointerInfo.pickInfo.pickedMesh == ground) {
+                    var vector = pointerInfo.pickInfo.pickedPoint;
+
+                    console.log('ground click: ' + vector.x + ',' + vector.y + ',' + vector.z);
+                    console.log("pointer info: " + pointerInfo.event.button);
+                }
+
                 break;
             case PointerEventTypes.POINTERUP:
                 pointerUp();
@@ -126,10 +178,6 @@ export async function makeBox(): Promise<Mesh> {
                 break;
         }
     });
-
-    var position = 1;
-    var box;
-    var boxes = [];
 
     // Add an event listener to the button
     btnaddbox.onPointerClickObservable.add(async () => {

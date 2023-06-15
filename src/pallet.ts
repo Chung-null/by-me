@@ -9,7 +9,7 @@ import { ground } from './ground';
 export async function makePallet(): Promise<Mesh> {
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#69"); //L91IFF#64, L91IFF#69
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#82"); //L91IFF#73, L91IFF#76, L91IFF#75
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -25,8 +25,12 @@ export async function makePallet(): Promise<Mesh> {
     location.isVisible = false;
     let listMenuShelf = advancedTexture.getControlByName("ListMenuShelf");
     listMenuShelf.isVisible = false;
-     let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
-     shelfWareInfo.isVisible = false;
+    let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
+    shelfWareInfo.isVisible = false;
+    let infomationinfobox = advancedTexture.getControlByName("InformationInfoBox");
+    infomationinfobox.isVisible = false;
+    let infomationinfoshelf = advancedTexture.getControlByName("InformationInfoShelf");
+    infomationinfoshelf.isVisible = false;
 
 
 
