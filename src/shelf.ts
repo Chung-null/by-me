@@ -192,12 +192,12 @@ export async function makeShelf(): Promise<Mesh> {
             txtZposition.text = currentMesh.position.z.toFixed(2);
 
             infomationinfoshelf.isVisible = true;
-            txtNameInfo.text = addNameShelf.toString()
-            txtWeightInfo.text = addWeightShelf.toString()
+            // txtNameInfo.text = addNameShelf.toString()
+            // txtWeightInfo.text = addWeightShelf.toString()
 
             var index = shelf.indexOf(currentMesh);
-            console.log("index " + index);
-            console.log("position " + currentMesh.position);
+            // console.log("index " + index);
+            // console.log("position " + currentMesh.position);
 
             camera.attachControl(canvas, true);
             startingPoint = null;
@@ -209,15 +209,15 @@ export async function makeShelf(): Promise<Mesh> {
         if (!startingPoint) {
             return;
         }
-        var current = getGroundPosition();
-        if (!current) {
+        var curreenShelf = getGroundPosition();
+        if (!curreenShelf) {
             return;
         }
 
-        var diff = current.subtract(startingPoint);
+        var diff = curreenShelf.subtract(startingPoint);
         currentMesh.position.addInPlace(diff);
 
-        startingPoint = current;
+        startingPoint = curreenShelf;
 
     }
     scene.onPointerObservable.add((pointerInfo, event) => {
@@ -267,37 +267,54 @@ export async function makeShelf(): Promise<Mesh> {
     });
 
 
-    // Add an event listener to the button
+    // Function to create a single shelf
+    async function createShelf(offsetX, offsetY, offsetZ) {
+        const result = await SceneLoader.ImportMeshAsync(
+            null,
+            "shelf/",
+            "shelfeton.obj",
+            scene,
+            function (container) { }
+        );
+
+        let mesh = result.meshes[0];
+        mesh.position.x = offsetX;
+        mesh.position.y = offsetY;
+        mesh.position.z = offsetZ;
+
+        shelf.push(mesh);
+    }
+
+    // Add an event listener to the "Add Shelf" button
     btnaddshelf.onPointerClickObservable.add(async () => {
-        listMenuShelf.isVisible = true
+        listMenuShelf.isVisible = true;
         btncloseshelf.onPointerUpObservable.add(() => {
             shelfWareInfo.isVisible = false;
             buttonShelfware.isVisible = true;
             listMenuShelf.isVisible = false;
         });
-        let txtaddColumn = <InputText>advancedTexture.getControlByName("InputTextColumn");
-        let txtaddRow = <InputText>advancedTexture.getControlByName("InputTextRow");
-        let txtaddDepth = <InputText>advancedTexture.getControlByName("InputTextDepth");
+
+        let txtaddColumn = <InputText>(
+            advancedTexture.getControlByName("InputTextColumn")
+        );
+        let txtaddRow = <InputText>(
+            advancedTexture.getControlByName("InputTextRow")
+        );
+        let txtaddDepth = <InputText>(
+            advancedTexture.getControlByName("InputTextDepth")
+        );
 
         // Retrieve the number of shelves from input text controls
-        let addRow = parseInt(txtaddRow.text)
-        let addColumn = parseInt(txtaddColumn.text)
-        let addDepth = parseInt(txtaddDepth.text)
+        let addRow = parseInt(txtaddRow.text);
+        let addColumn = parseInt(txtaddColumn.text);
+        let addDepth = parseInt(txtaddDepth.text);
 
         // Import the mesh
         for (let i = 0; i < addRow; i++) {
             for (let j = 0; j < addColumn; j++) {
                 for (let k = 0; k < addDepth; k++) {
-                    // Import the mesh
-                    const result = await SceneLoader.ImportMeshAsync(null, "shelf/", "shelfeton.obj", scene, function (container) {
-                    });
-                    let meshs = result.meshes[0];
-                    meshs.position.x = offsetX;
-                    meshs.position.y = offsetY;
-                    meshs.position.z = offsetZ;
-
+                    await createShelf(offsetX, offsetY, offsetZ);
                     offsetZ += 2;
-                    shelf.push(meshs);
                 }
                 offsetZ = 0;
                 offsetY += 2;
@@ -306,14 +323,13 @@ export async function makeShelf(): Promise<Mesh> {
             offsetY = 0;
             offsetX += 1;
         }
+
         // Reset input text values
         txtaddColumn.text = "";
         txtaddRow.text = "";
         txtaddDepth.text = "";
-        // txtHeight.text = "";
-        // txtWidth.text = "";
-        // txtDepth.text = "";
     });
+
     btneditshelf.onPointerClickObservable.add(() => {
         // Initialize GizmoManager
         var gizmoManager = new GizmoManager(scene)

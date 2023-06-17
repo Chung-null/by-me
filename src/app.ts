@@ -7,7 +7,7 @@ import { makeWare } from './warehouse'
 import { makeBox } from './box'
 import { makePallet } from './pallet'
 import { makeConveyor } from './conveyor'
-import { handlers } from './mockapi/handlers'
+
 
 async function main(): Promise<void> {
     // var api = new handlers()
@@ -18,14 +18,13 @@ async function main(): Promise<void> {
     const ammo = await Ammo()
     const physics: AmmoJSPlugin = new AmmoJSPlugin(true, ammo)
     scene.enablePhysics(new Vector3(0, -9.81, 0), physics)
-
+    makePallet()
+    makeWare()
+    makeConveyor()
     makeShelf()
     makeGround()
     makeFPS()
-    makeWare()
     makeBox()
-    makePallet()
-    makeConveyor()
     // run the main render loop
     engine.runRenderLoop(() => scene.render())
 }
