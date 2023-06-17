@@ -5,6 +5,8 @@ import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
 import { InputText } from '@babylonjs/gui';
 
+
+
 export async function makeBox(): Promise<Mesh> {
     var startingBox;
     var currentBox;
@@ -65,9 +67,9 @@ export async function makeBox(): Promise<Mesh> {
     });
 
     var getGroundPosition = function () {
-        var pickinfobox = scene.pick(scene.pointerX, scene.pointerY, function (box) { return box == ground; });
-        if (pickinfobox.hit) {
-            return pickinfobox.pickedPoint;
+        var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (box) { return box == ground; });
+        if (pickinfo.hit) {
+            return pickinfo.pickedPoint;
         }
 
         return null;
@@ -175,33 +177,29 @@ export async function makeBox(): Promise<Mesh> {
         }
     });
 
-    // Function to create box
-    async function createBox(position) {
+    // Function to create a box and return it as a Promise
+    async function createBox(){
         // Import the box
-        const result = await SceneLoader.ImportMeshAsync(null, "box/", "boxeton.obj", scene, function (container) {
-            // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
-        });
+        const result = await SceneLoader.ImportMeshAsync(null, "box/", "boxeton.obj", scene);
+        const box = result.meshes[0];
 
-        let box = result.meshes[0];
-        if (position != 1) {
+        // Adjust the position of the box
+        if (position !== 1) {
             box.position.x += position;
         } else {
             box.position.x += 4;
         }
 
-        return box;
-    }
-
-    // Add an event listener to the button
-    btnaddbox.onPointerClickObservable.add(async () => {
-        // Create box
-        let box = await createBox(position);
-
-        // Update position for the next box
         position = box.position.x + 4;
 
-        // Add the box to the array
         boxes.push(box);
+
+    }
+
+    // Event handler for the "Add Box" button
+    btnaddbox.onPointerClickObservable.add(async () => {
+        const box = await createBox();
+        // You can perform additional actions with the created box if needed
     });
 
     btneditbox.onPointerClickObservable.add(() => {

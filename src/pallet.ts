@@ -25,8 +25,8 @@ export async function makePallet(): Promise<Mesh> {
     location.isVisible = false;
     let listMenuShelf = advancedTexture.getControlByName("ListMenuShelf");
     listMenuShelf.isVisible = false;
-     let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
-     shelfWareInfo.isVisible = false;
+    let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
+    shelfWareInfo.isVisible = false;
 
 
 
@@ -132,8 +132,7 @@ export async function makePallet(): Promise<Mesh> {
     var pallet;
     var palletes = [];
 
-    // Add an event listener to the button
-    btnaddpallet.onPointerClickObservable.add(async () => {
+    async function createPallet() {
         // Import the pallet
         const result = await SceneLoader.ImportMeshAsync(null, "pallet/", "palleteton.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
@@ -150,7 +149,11 @@ export async function makePallet(): Promise<Mesh> {
 
 
         palletes.push(pallet);
-        // console.log("pallet button " + palletes.length);
+    }
+
+    // Add an event listener to the button
+    btnaddpallet.onPointerClickObservable.add(async () => {
+        let palet = await createPallet();
     });
     btneditpallet.onPointerClickObservable.add(() => {
         // Initialize GizmoManager

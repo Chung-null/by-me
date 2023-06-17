@@ -7,24 +7,24 @@ import { ground } from './ground';
 
 
 export async function makeWare(): Promise<Mesh> {
-   // Load in a full screen GUI from the snippet server
-   let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-   let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#69"); //L91IFF#64, L91IFF#69
-   advancedTexture.idealWidth = 1920;
-   advancedTexture.idealHeight = 1080;
-   //Close all
-   let warehouseInfo = advancedTexture.getControlByName("WarehouseInfo");
-   warehouseInfo.isVisible = false;
-   let conveyorbeltInfo = advancedTexture.getControlByName("ConveyorbeltInfo");
-   conveyorbeltInfo.isVisible = false;
-   let boxInfo = advancedTexture.getControlByName("BoxInfo");
-   boxInfo.isVisible = false;
-   let palletInfo = advancedTexture.getControlByName("PalletInfo");
-   palletInfo.isVisible = false;
-   let location = advancedTexture.getControlByName("Location");
-   location.isVisible = false;
-   let listMenuShelf = advancedTexture.getControlByName("ListMenuShelf");
-   listMenuShelf.isVisible = false;
+    // Load in a full screen GUI from the snippet server
+    let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#69"); //L91IFF#64, L91IFF#69
+    advancedTexture.idealWidth = 1920;
+    advancedTexture.idealHeight = 1080;
+    //Close all
+    let warehouseInfo = advancedTexture.getControlByName("WarehouseInfo");
+    warehouseInfo.isVisible = false;
+    let conveyorbeltInfo = advancedTexture.getControlByName("ConveyorbeltInfo");
+    conveyorbeltInfo.isVisible = false;
+    let boxInfo = advancedTexture.getControlByName("BoxInfo");
+    boxInfo.isVisible = false;
+    let palletInfo = advancedTexture.getControlByName("PalletInfo");
+    palletInfo.isVisible = false;
+    let location = advancedTexture.getControlByName("Location");
+    location.isVisible = false;
+    let listMenuShelf = advancedTexture.getControlByName("ListMenuShelf");
+    listMenuShelf.isVisible = false;
     let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
     shelfWareInfo.isVisible = false;
 
@@ -129,26 +129,39 @@ export async function makeWare(): Promise<Mesh> {
     var ware;
     var wares = [];
 
-    // Add an event listener to the button
-    btnaddware.onPointerClickObservable.add(async () => {
-        // Import the mesh
-        const result = await SceneLoader.ImportMeshAsync(null, "warehouse/", "eton.obj", scene, function (container) {
-            // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
-        });
-        ware = result.meshes[0];
+    // ...
+
+    async function createWarehouse() {
+        const warehouse = await SceneLoader.ImportMeshAsync(
+            null,
+            "warehouse/",
+            "eton.obj",
+            scene,
+            function (container) {
+                // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
+            }
+        );
+        const ware = warehouse.meshes[0];
         if (position != 1) {
             ware.position.x += position;
-        }
-        else {
+        } else {
             ware.position.x += 4;
         }
 
         position = ware.position.x + 4;
 
+        wares.push(ware)
+    }
 
-        wares.push(ware);
-        // console.log("mesh button " + meshes.length);
+    // ...
+
+    btnaddware.onPointerClickObservable.add(async () => {
+        const ware = await createWarehouse();
+        // Additional logic after creating the warehouse can be added here
     });
+
+    // ...
+
     btneditware.onPointerClickObservable.add(() => {
         // Initialize GizmoManager
         var gizmoManager = new GizmoManager(scene)

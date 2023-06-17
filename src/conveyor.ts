@@ -129,26 +129,25 @@ export async function makeConveyor(): Promise<Mesh> {
     var conveyor;
     var palletes = [];
 
-    // Add an event listener to the button
-    btnaddconve.onPointerClickObservable.add(async () => {
-        // Import the conveyor
-        const result = await SceneLoader.ImportMeshAsync(null, "conveyor/", "conveyor.obj", scene, function (container) {
+    async function createConveyor() {
+        const conveyorhouse = await SceneLoader.ImportMeshAsync(null, "conveyor/", "conveyor.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
-        conveyor = result.meshes[0];
+        const conveyor = conveyorhouse.meshes[0];
         if (position != 1) {
             conveyor.position.x += position;
-        }
-        else {
+        } else {
             conveyor.position.x += 4;
         }
 
         position = conveyor.position.x + 4;
 
-
         palletes.push(conveyor);
-        // console.log("conveyor button " + palletes.length);
+    }
+    btnaddconve.onPointerClickObservable.add(() => {
+        let conve = createConveyor();
     });
+
     btneditconve.onPointerClickObservable.add(() => {
         // Initialize GizmoManager
         var gizmoManager = new GizmoManager(scene)
