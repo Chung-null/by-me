@@ -1,10 +1,2 @@
-# Bỏ qua tệp .env
-.env
 
-# Bỏ qua thư mục build
-/build/
-
-# Bỏ qua tất cả các tệp .log
-*.log
-# Bỏ qua thư mục gói phụ thuộc (node_modules)
-node_modules/
+node_modules
