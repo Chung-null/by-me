@@ -3,10 +3,7 @@ import { scene, engine, camera, canvas } from './scene'
 import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
-import { handlers } from './mockapi/handlers';
 import { InputText } from '@babylonjs/gui';
-
-
 
 export async function makeBox(): Promise<Mesh> {
     var startingBox;
@@ -15,7 +12,6 @@ export async function makeBox(): Promise<Mesh> {
     var position = 1;
     var box;
     var boxes = [];
-    var apiBox = new handlers();
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
     let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#82"); //L91IFF#73, L91IFF#76, L91IFF#75
@@ -69,9 +65,9 @@ export async function makeBox(): Promise<Mesh> {
     });
 
     var getGroundPosition = function () {
-        var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (box) { return box == ground; });
-        if (pickinfo.hit) {
-            return pickinfo.pickedPoint;
+        var pickinfobox = scene.pick(scene.pointerX, scene.pointerY, function (box) { return box == ground; });
+        if (pickinfobox.hit) {
+            return pickinfobox.pickedPoint;
         }
 
         return null;
@@ -114,9 +110,9 @@ export async function makeBox(): Promise<Mesh> {
             // outlinebox.renderOutline = false;
             camera.attachControl(canvas, true);
             infomationinfobox.isVisible = true;
-            txtBoxNameInfo.text = addNameBox.toString()
-            txtImportInfo.text = addImportBox.toString()
-            txtExportInfo.text = addExportBox.toString()
+            // txtBoxNameInfo.text = addNameBox.toString()
+            // txtImportInfo.text = addImportBox.toString()
+            // txtExportInfo.text = addExportBox.toString()
             startingBox = null;
             return;
         }
@@ -125,15 +121,15 @@ export async function makeBox(): Promise<Mesh> {
         if (!startingBox) {
             return;
         }
-        var current = getGroundPosition();
-        if (!current) {
+        var currentbox = getGroundPosition();
+        if (!currentbox) {
             return;
         }
 
-        var diff = current.subtract(startingBox);
+        var diff = currentbox.subtract(startingBox);
         currentBox.position.addInPlace(diff);
 
-        startingBox = current;
+        startingBox = currentbox;
 
     }
     scene.onPointerObservable.add((pointerInfo) => {
@@ -179,26 +175,35 @@ export async function makeBox(): Promise<Mesh> {
         }
     });
 
-    // Add an event listener to the button
-    btnaddbox.onPointerClickObservable.add(async () => {
+    // Function to create box
+    async function createBox(position) {
         // Import the box
         const result = await SceneLoader.ImportMeshAsync(null, "box/", "boxeton.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
-        box = result.meshes[0];
+
+        let box = result.meshes[0];
         if (position != 1) {
             box.position.x += position;
-        }
-        else {
+        } else {
             box.position.x += 4;
         }
 
+        return box;
+    }
+
+    // Add an event listener to the button
+    btnaddbox.onPointerClickObservable.add(async () => {
+        // Create box
+        let box = await createBox(position);
+
+        // Update position for the next box
         position = box.position.x + 4;
 
-
+        // Add the box to the array
         boxes.push(box);
-        // console.log("box button " + boxes.length);
     });
+
     btneditbox.onPointerClickObservable.add(() => {
         // Initialize GizmoManager
         var gizmoManager = new GizmoManager(scene)
