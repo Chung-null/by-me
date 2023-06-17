@@ -4,7 +4,6 @@ import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { InputText } from '@babylonjs/gui';
 import { ground } from './ground';
-import { handlers } from './mockapi/handlers';
 
 export async function makeShelf(): Promise<Mesh> {
     var startingPoint;
@@ -15,7 +14,6 @@ export async function makeShelf(): Promise<Mesh> {
     let offsetX = 0;
     let offsetY = 0;
     let offsetZ = 0;
-    var apishelf = new handlers()
     // check mesh in drag-area or not
     interface Position {
         x: number
@@ -130,14 +128,9 @@ export async function makeShelf(): Promise<Mesh> {
     let txtNameInfo = <InputText>advancedTexture.getControlByName("InputNameShelfinfo");
     let txtWeightInfo = <InputText>advancedTexture.getControlByName("InputShelfinfo");
 
-    let currentshelf = await apishelf.getWithID("Shelf", 1)
     let addIdShelf
     let addNameShelf
     let addWeightShelf
-    if (currentshelf.status == 200) {
-        addNameShelf = currentshelf.content.name
-        addWeightShelf = currentshelf.content.weight
-    }
 
     var getGroundPosition = function () {
         var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (mesh) { return mesh == ground; });
