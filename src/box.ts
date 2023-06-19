@@ -16,7 +16,7 @@ export async function makeBox(): Promise<Mesh> {
     var boxes = [];
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#93");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#95");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -26,7 +26,9 @@ export async function makeBox(): Promise<Mesh> {
     listMenuShelf.isVisible = false;
     let listMenuBox = advancedTexture.getControlByName("ListMenuBox");
     listMenuBox.isVisible = false;
-  
+    let listexportbox = advancedTexture.getControlByName("ListExportBox");
+    listexportbox.isVisible = false;
+
 
     let buttonListBox = advancedTexture.getControlByName("ButtonBox");
     //Get Location Object
@@ -54,7 +56,7 @@ export async function makeBox(): Promise<Mesh> {
         // Import the box
         const result = await SceneLoader.ImportMeshAsync(null, "box/", "boxeton.obj", scene);
         const box = result.meshes[0];
-
+        
         // Adjust the position of the box
         if (position !== 1) {
             box.position.x += position;
@@ -90,6 +92,7 @@ export async function makeBox(): Promise<Mesh> {
 
     var pointerDown = function (box) {
         if (currentBox) {
+
             // currentBox.material.wireframe = false;
             // outlinebox
             outlinebox = currentBox;
@@ -98,6 +101,7 @@ export async function makeBox(): Promise<Mesh> {
             txtXposition.text = "";
             txtYposition.text = "";
             txtZposition.text = "";
+            listexportbox.isVisible = false
         }
 
         currentBox = box;
@@ -121,10 +125,13 @@ export async function makeBox(): Promise<Mesh> {
         if (startingBox) {
             camera.attachControl(canvas, true);
             startingBox = null;
+
             location.isVisible = true;
             txtXposition.text = currentBox.position.x.toFixed(2);
             txtYposition.text = currentBox.position.y.toFixed(2);
             txtZposition.text = currentBox.position.z.toFixed(2);
+
+            listexportbox.isVisible = true
             return;
         }
     }
@@ -162,6 +169,7 @@ export async function makeBox(): Promise<Mesh> {
                         txtXposition.text = "";
                         txtYposition.text = "";
                         txtZposition.text = "";
+                        listexportbox.isVisible = false;
                     }
                 }
                 else if (pointerInfo.pickInfo.pickedMesh == ground && pointerInfo.event.button == 0) {

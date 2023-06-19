@@ -13,7 +13,7 @@ export async function makeWare(): Promise<Mesh> {
     var wares = [];
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#93");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#95");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -24,6 +24,8 @@ export async function makeWare(): Promise<Mesh> {
     let listMenuBox = advancedTexture.getControlByName("ListMenuBox")
     listMenuBox.isVisible = false;
     let btndelete = advancedTexture.getControlByName("BtnDelete")
+    let listexportbox = advancedTexture.getControlByName("ListExportBox");
+    listexportbox.isVisible = false;
 
     async function createWarehouse() {
         // Import the pallet
