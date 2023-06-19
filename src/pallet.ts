@@ -7,50 +7,51 @@ import { ground } from './ground';
 
 
 export async function makePallet(): Promise<Mesh> {
+    var startingPallet;
+    var currentPallet;
+    var outlinepallet;
+    var position = 1;
+    var pallet;
+    var palletes = [];
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#69"); //L91IFF#64, L91IFF#69
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#93");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
-    let warehouseInfo = advancedTexture.getControlByName("WarehouseInfo");
-    warehouseInfo.isVisible = false;
-    let conveyorbeltInfo = advancedTexture.getControlByName("ConveyorbeltInfo");
-    conveyorbeltInfo.isVisible = false;
-    let boxInfo = advancedTexture.getControlByName("BoxInfo");
-    boxInfo.isVisible = false;
-    let palletInfo = advancedTexture.getControlByName("PalletInfo");
-    palletInfo.isVisible = false;
     let location = advancedTexture.getControlByName("Location");
     location.isVisible = false;
     let listMenuShelf = advancedTexture.getControlByName("ListMenuShelf");
     listMenuShelf.isVisible = false;
-    let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
-    shelfWareInfo.isVisible = false;
+    let listMenuBox = advancedTexture.getControlByName("ListMenuBox")
+    listMenuBox.isVisible = false;
+    let btndelete = advancedTexture.getControlByName("BtnDelete");
+
+    async function createPallet() {
+        // Import the pallet
+        const result = await SceneLoader.ImportMeshAsync(null, "pallet/", "palleteton.obj", scene, function (container) {
+            // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
+        });
+        pallet = result.meshes[0];
+        if (position != 1) {
+            pallet.position.x += position;
+        }
+        else {
+            pallet.position.x += 4;
+        }
+
+        position = pallet.position.x + 4;
 
 
+        palletes.push(pallet);
+    }
 
     //Event click button Shelfinfo
     let buttonPallet = advancedTexture.getControlByName("ButtonPallet");
-    buttonPallet.onPointerClickObservable.add(() => {
-        palletInfo.isVisible = true;
-        buttonPallet.isVisible = true;
+    buttonPallet.onPointerClickObservable.add(async() => {
+        let palet = await createPallet();
     });
 
-    let btnaddpallet = advancedTexture.getControlByName("BtnAddPallet");
-    let btndeletepallet = advancedTexture.getControlByName("BtnDeletePallet");
-    let btneditpallet = advancedTexture.getControlByName("BtnEditPallet");
-    let btnclosepallet = advancedTexture.getControlByName("BtnClosePallet");
-
-    btnclosepallet.onPointerUpObservable.add(() => {
-        palletInfo.isVisible = false;
-        buttonPallet.isVisible = true;
-    });
-
-
-    var startingPallet;
-    var currentPallet;
-    var outlinepallet;
     var getGroundPosition = function () {
         var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (pallet) { return pallet == ground; });
         if (pickinfo.hit) {
@@ -127,58 +128,8 @@ export async function makePallet(): Promise<Mesh> {
                 break;
         }
     });
-
-    var position = 1;
-    var pallet;
-    var palletes = [];
-
-    async function createPallet() {
-        // Import the pallet
-        const result = await SceneLoader.ImportMeshAsync(null, "pallet/", "palleteton.obj", scene, function (container) {
-            // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
-        });
-        pallet = result.meshes[0];
-        if (position != 1) {
-            pallet.position.x += position;
-        }
-        else {
-            pallet.position.x += 4;
-        }
-
-        position = pallet.position.x + 4;
-
-
-        palletes.push(pallet);
-    }
-
-    // Add an event listener to the button
-    btnaddpallet.onPointerClickObservable.add(async () => {
-        let palet = await createPallet();
-    });
-    btneditpallet.onPointerClickObservable.add(() => {
-        // Initialize GizmoManager
-        var gizmoManager = new GizmoManager(scene)
-        gizmoManager.boundingBoxGizmoEnabled = true
-        // Restrict gizmos to only spheres
-        gizmoManager.attachableMeshes = palletes
-        // Toggle gizmos with keyboard buttons
-        document.onkeydown = (e) => {
-            if (e.key == 'w') {
-                gizmoManager.positionGizmoEnabled = !gizmoManager.positionGizmoEnabled
-            }
-            if (e.key == 'e') {
-                gizmoManager.rotationGizmoEnabled = !gizmoManager.rotationGizmoEnabled
-            }
-            if (e.key == 'r') {
-                gizmoManager.scaleGizmoEnabled = !gizmoManager.scaleGizmoEnabled
-            }
-            if (e.key == 'q') {
-                gizmoManager.boundingBoxGizmoEnabled = !gizmoManager.boundingBoxGizmoEnabled
-            }
-        }
-    })
     // delete selected palletes
-    btndeletepallet.onPointerClickObservable.add(() => {
+    btndelete.onPointerClickObservable.add(() => {
         if (currentPallet != null) {
             currentPallet.dispose();
             currentPallet = null;

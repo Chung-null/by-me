@@ -6,65 +6,64 @@ import { ground } from './ground';
 
 
 export async function makeConveyor(): Promise<Mesh> {
+    var startingConveyor;
+    var currentConveyor;
+    var outlineconveyor;
+    var position = 1;
+    var conveyor;
+    var palletes = [];
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#69"); //L91IFF#64, L91IFF#69
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#93");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
-    let warehouseInfo = advancedTexture.getControlByName("WarehouseInfo");
-    warehouseInfo.isVisible = false;
-    let conveyorbeltInfo = advancedTexture.getControlByName("ConveyorbeltInfo");
-    conveyorbeltInfo.isVisible = false;
-    let boxInfo = advancedTexture.getControlByName("BoxInfo");
-    boxInfo.isVisible = false;
-    let palletInfo = advancedTexture.getControlByName("PalletInfo");
-    palletInfo.isVisible = false;
     let location = advancedTexture.getControlByName("Location");
     location.isVisible = false;
     let listMenuShelf = advancedTexture.getControlByName("ListMenuShelf");
     listMenuShelf.isVisible = false;
-    let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
-    shelfWareInfo.isVisible = false;
+    let listMenuBox = advancedTexture.getControlByName("ListMenuBox")
+    listMenuBox.isVisible = false;
+    let btndelete = advancedTexture.getControlByName("BtnDelete")
 
+
+
+    async function createConveyor() {
+        const conveyorhouse = await SceneLoader.ImportMeshAsync(null, "conveyor/", "conveyor.obj", scene, function (container) {
+            // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
+        });
+        const conveyor = conveyorhouse.meshes[0];
+        if (position != 1) {
+            conveyor.position.x += position;
+        } else {
+            conveyor.position.x += 4;
+        }
+
+        position = conveyor.position.x + 4;
+
+        palletes.push(conveyor);
+    }
     //Event click button Shelfinfo
     let buttonConveyor = advancedTexture.getControlByName("ButtonConveyor");
-    buttonConveyor.onPointerClickObservable.add(() => {
-        conveyorbeltInfo.isVisible = true;
-        buttonConveyor.isVisible = true;
+    buttonConveyor.onPointerClickObservable.add(async () => {
+        let conve = await createConveyor();
     });
 
-    let btnaddconve = advancedTexture.getControlByName("BtnAddConve");
-    let btndeleteconve = advancedTexture.getControlByName("BtnDeleteConve");
-    let btneditconve = advancedTexture.getControlByName("BtnEditConve");
-    let btncloseconve = advancedTexture.getControlByName("BtnCloseConve");
-
-    btncloseconve.onPointerUpObservable.add(() => {
-        conveyorbeltInfo.isVisible = false;
-        buttonConveyor.isVisible = true;
-    });
-
-
-    var startingConveyor;
-    var currentConveyor;
-    var outlineconveyor;
     var getGroundPosition = function () {
-        var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (conveyor) { return conveyor == ground; });
-        if (pickinfo.hit) {
-            return pickinfo.pickedPoint;
+        var pickinfoconveyor = scene.pick(scene.pointerX, scene.pointerY, function (conveyor) { return conveyor == ground; });
+        if (pickinfoconveyor.hit) {
+            return pickinfoconveyor.pickedPoint;
         }
 
         return null;
     }
     var pointerDown = function (conveyor) {
+        currentConveyor = conveyor;
         if (currentConveyor) {
-            // currentConveyor.material.wireframe = false;
             // outlineconveyor
             outlineconveyor = currentConveyor;
             outlineconveyor.renderOutline = false;
         }
-
-        currentConveyor = conveyor;
         // currentConveyor.material.wireframe = true;
         // outlineconveyor
         outlineconveyor = currentConveyor;
@@ -83,12 +82,7 @@ export async function makeConveyor(): Promise<Mesh> {
     }
     var pointerUp = function () {
         if (startingConveyor) {
-            // currentConveyor.material.wireframe = false;
-
-            // // outlineconveyor
-            // outlineconveyor = currentConveyor;
-            // outlineconveyor.renderOutline = false;
-            // camera.attachControl(canvas, true);
+            camera.attachControl(canvas, true);
             startingConveyor = null;
             return;
         }
@@ -124,54 +118,8 @@ export async function makeConveyor(): Promise<Mesh> {
                 break;
         }
     });
-
-    var position = 1;
-    var conveyor;
-    var palletes = [];
-
-    async function createConveyor() {
-        const conveyorhouse = await SceneLoader.ImportMeshAsync(null, "conveyor/", "conveyor.obj", scene, function (container) {
-            // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
-        });
-        const conveyor = conveyorhouse.meshes[0];
-        if (position != 1) {
-            conveyor.position.x += position;
-        } else {
-            conveyor.position.x += 4;
-        }
-
-        position = conveyor.position.x + 4;
-
-        palletes.push(conveyor);
-    }
-    btnaddconve.onPointerClickObservable.add(() => {
-        let conve = createConveyor();
-    });
-
-    btneditconve.onPointerClickObservable.add(() => {
-        // Initialize GizmoManager
-        var gizmoManager = new GizmoManager(scene)
-        gizmoManager.boundingBoxGizmoEnabled = true
-        // Restrict gizmos to only spheres
-        gizmoManager.attachableMeshes = palletes
-        // Toggle gizmos with keyboard buttons
-        document.onkeydown = (e) => {
-            if (e.key == 'w') {
-                gizmoManager.positionGizmoEnabled = !gizmoManager.positionGizmoEnabled
-            }
-            if (e.key == 'e') {
-                gizmoManager.rotationGizmoEnabled = !gizmoManager.rotationGizmoEnabled
-            }
-            if (e.key == 'r') {
-                gizmoManager.scaleGizmoEnabled = !gizmoManager.scaleGizmoEnabled
-            }
-            if (e.key == 'q') {
-                gizmoManager.boundingBoxGizmoEnabled = !gizmoManager.boundingBoxGizmoEnabled
-            }
-        }
-    })
     // delete selected palletes
-    btndeleteconve.onPointerClickObservable.add(() => {
+    btndelete.onPointerClickObservable.add(() => {
         if (currentConveyor != null) {
             currentConveyor.dispose();
             currentConveyor = null;

@@ -1,4 +1,4 @@
-import { AbstractMesh, Camera, Color3, GizmoManager, HighlightLayer, Matrix, Mesh, MeshBuilder, PhysicsImpostor, PointerEventTypes, PositionGizmo, SceneLoader, TransformNode, UtilityLayerRenderer, Vector3 } from '@babylonjs/core'
+import { AbstractMesh, Camera, Color3, GizmoManager, HighlightLayer, Matrix, Mesh, MeshBuilder, PhysicsImpostor, PointerEventTypes, PositionGizmo, SceneLoader, StandardMaterial, TransformNode, UtilityLayerRenderer, Vector3 } from '@babylonjs/core'
 import { scene, engine, camera, canvas } from './scene'
 import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
@@ -83,42 +83,26 @@ export async function makeShelf(): Promise<Mesh> {
     }
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#82"); //L91IFF#73, L91IFF#81, L91IFF#82
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#93");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
-    let warehouseInfo = advancedTexture.getControlByName("WarehouseInfo");
-    warehouseInfo.isVisible = false;
-    let conveyorbeltInfo = advancedTexture.getControlByName("ConveyorbeltInfo");
-    conveyorbeltInfo.isVisible = false;
-    let boxInfo = advancedTexture.getControlByName("BoxInfo");
-    boxInfo.isVisible = false;
-    let palletInfo = advancedTexture.getControlByName("PalletInfo");
-    palletInfo.isVisible = false;
     let location = advancedTexture.getControlByName("Location");
     location.isVisible = false;
     let listMenuShelf = advancedTexture.getControlByName("ListMenuShelf");
     listMenuShelf.isVisible = false;
-    let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
-    shelfWareInfo.isVisible = false;
-    let infomationinfobox = advancedTexture.getControlByName("InformationInfoBox");
-    infomationinfobox.isVisible = false;
-    let infomationinfoshelf = advancedTexture.getControlByName("InformationInfoShelf");
-    infomationinfoshelf.isVisible = false;
+    let listMenuBox = advancedTexture.getControlByName("ListMenuBox")
+    listMenuBox.isVisible = false;
 
     let buttonShelfware = advancedTexture.getControlByName("ButtonShelfware");
-    buttonShelfware.onPointerClickObservable.add(() => {
-        shelfWareInfo.isVisible = true;
-        buttonShelfware.isVisible = true;
-    });
+    let colorpickershelf = advancedTexture.getControlByName("ColorPicker") as GUI.ColorPicker;
 
-    let btnaddshelf = advancedTexture.getControlByName("BtnAddShelf");
-    let btndeleteshelf = advancedTexture.getControlByName("BtnDeleteShelf");
-    let btneditshelf = advancedTexture.getControlByName("BtnEditShelf");
-    let btncloseshelf = advancedTexture.getControlByName("BtnCloseShelf");
+
     let btnselect = advancedTexture.getControlByName("BtnSelect");
     let btngroup = advancedTexture.getControlByName("BtnGroup");
-    let btnSaveInfoShelf = advancedTexture.getControlByName("ButtonSaveInfoshelf");
+    let btnsaveshelf = advancedTexture.getControlByName("BtnSaveShelf");
+    let btndelete = advancedTexture.getControlByName("BtnDelete");
+    let btncloseshelf = advancedTexture.getControlByName("BtnCloseShelf");
 
     //Get Location Object
     let txtXposition = <InputText>advancedTexture.getControlByName("InputTextX");
@@ -127,10 +111,68 @@ export async function makeShelf(): Promise<Mesh> {
     //Get Info Shelf
     let txtNameInfo = <InputText>advancedTexture.getControlByName("InputNameShelfinfo");
     let txtWeightInfo = <InputText>advancedTexture.getControlByName("InputShelfinfo");
+    let txtaddColumn = <InputText>advancedTexture.getControlByName("InputTextColumn");
+    let txtaddRow = <InputText>advancedTexture.getControlByName("InputTextRow");
+    let txtaddDepth = <InputText>advancedTexture.getControlByName("InputTextDepth");
 
-    let addIdShelf
-    let addNameShelf
-    let addWeightShelf
+    var shelfMaterial = new StandardMaterial("shelfmat", scene);
+    // Function to create a single shelf
+    async function createShelf(offsetX, offsetY, offsetZ) {
+        const result = await SceneLoader.ImportMeshAsync(
+            null,
+            "shelf/",
+            "shelfeton.obj",
+            scene,
+            function (container) { }
+        );
+
+        let mesh = result.meshes[0];
+        mesh.position.x = offsetX;
+        mesh.position.y = offsetY;
+        mesh.position.z = offsetZ;
+        mesh.material = shelfMaterial;
+
+        shelf.push(mesh);
+    }
+    buttonShelfware.onPointerClickObservable.add(() => {
+        listMenuShelf.isVisible = true;
+    });
+
+    colorpickershelf.value = shelfMaterial.diffuseColor;
+    buttonShelfware.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+    colorpickershelf.onValueChangedObservable.add(function (value) { 
+        shelfMaterial.diffuseColor.copyFrom(value);
+    });
+    btnsaveshelf.onPointerClickObservable.add(async () => {
+        // Retrieve the number of shelves from input text controls
+        let addRow = parseInt(txtaddRow.text);
+        let addColumn = parseInt(txtaddColumn.text);
+        let addDepth = parseInt(txtaddDepth.text);
+        // let addWeightShelf = parseInt(txtWeightInfo.text);
+        // let addNameShlef = txtNameInfo.text
+        // Import the mesh
+        for (let i = 0; i < addRow; i++) {
+            for (let j = 0; j < addColumn; j++) {
+                for (let k = 0; k < addDepth; k++) {
+                    await createShelf(offsetX, offsetY, offsetZ);
+                    offsetZ += 2;
+                }
+                offsetZ = 0;
+                offsetY += 2;
+            }
+            offsetZ = 0;
+            offsetY = 0;
+            offsetX += 1;
+        }
+
+        // Reset input text values
+        txtaddColumn.text = "";
+        txtaddRow.text = "";
+        txtaddDepth.text = "";
+    })
+    btncloseshelf.onPointerUpObservable.add(() => {
+        listMenuShelf.isVisible = false;
+    });
 
     var getGroundPosition = function () {
         var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (mesh) { return mesh == ground; });
@@ -142,7 +184,6 @@ export async function makeShelf(): Promise<Mesh> {
     }
     var pointerDown = function (mesh) {
         if (currentMesh) {
-            // currentMesh.material.wireframe = false;
             // outline
             outline = currentMesh;
             outline.renderOutline = false;
@@ -150,9 +191,6 @@ export async function makeShelf(): Promise<Mesh> {
             txtXposition.text = "";
             txtYposition.text = "";
             txtZposition.text = "";
-            infomationinfoshelf.isVisible = false;
-            txtNameInfo.text = "";
-            txtWeightInfo.text = "";
 
         }
         toggledMesh = checkdragboxExits(); // if (toggledMesh == false) do nothing : toggledMesh = true remove
@@ -161,7 +199,6 @@ export async function makeShelf(): Promise<Mesh> {
         }
 
         currentMesh = mesh;
-        // currentMesh.material.wireframe = true;
         // outline
         outline = currentMesh;
         outline.outlineWidth = 0.2;
@@ -190,10 +227,6 @@ export async function makeShelf(): Promise<Mesh> {
             txtXposition.text = currentMesh.position.x.toFixed(2);
             txtYposition.text = currentMesh.position.y.toFixed(2);
             txtZposition.text = currentMesh.position.z.toFixed(2);
-
-            infomationinfoshelf.isVisible = true;
-            // txtNameInfo.text = addNameShelf.toString()
-            // txtWeightInfo.text = addWeightShelf.toString()
 
             var index = shelf.indexOf(currentMesh);
             // console.log("index " + index);
@@ -238,9 +271,6 @@ export async function makeShelf(): Promise<Mesh> {
                         txtXposition.text = "";
                         txtYposition.text = "";
                         txtZposition.text = "";
-                        infomationinfoshelf.isVisible = false;
-                        txtNameInfo.text = "";
-                        txtWeightInfo.text = "";
 
                     }
                     // console.log("down");
@@ -265,95 +295,8 @@ export async function makeShelf(): Promise<Mesh> {
                 break;
         }
     });
-
-
-    // Function to create a single shelf
-    async function createShelf(offsetX, offsetY, offsetZ) {
-        const result = await SceneLoader.ImportMeshAsync(
-            null,
-            "shelf/",
-            "shelfeton.obj",
-            scene,
-            function (container) { }
-        );
-
-        let mesh = result.meshes[0];
-        mesh.position.x = offsetX;
-        mesh.position.y = offsetY;
-        mesh.position.z = offsetZ;
-
-        shelf.push(mesh);
-    }
-
-    // Add an event listener to the "Add Shelf" button
-    btnaddshelf.onPointerClickObservable.add(async () => {
-        listMenuShelf.isVisible = true;
-        btncloseshelf.onPointerUpObservable.add(() => {
-            shelfWareInfo.isVisible = false;
-            buttonShelfware.isVisible = true;
-            listMenuShelf.isVisible = false;
-        });
-
-        let txtaddColumn = <InputText>(
-            advancedTexture.getControlByName("InputTextColumn")
-        );
-        let txtaddRow = <InputText>(
-            advancedTexture.getControlByName("InputTextRow")
-        );
-        let txtaddDepth = <InputText>(
-            advancedTexture.getControlByName("InputTextDepth")
-        );
-
-        // Retrieve the number of shelves from input text controls
-        let addRow = parseInt(txtaddRow.text);
-        let addColumn = parseInt(txtaddColumn.text);
-        let addDepth = parseInt(txtaddDepth.text);
-
-        // Import the mesh
-        for (let i = 0; i < addRow; i++) {
-            for (let j = 0; j < addColumn; j++) {
-                for (let k = 0; k < addDepth; k++) {
-                    await createShelf(offsetX, offsetY, offsetZ);
-                    offsetZ += 2;
-                }
-                offsetZ = 0;
-                offsetY += 2;
-            }
-            offsetZ = 0;
-            offsetY = 0;
-            offsetX += 1;
-        }
-
-        // Reset input text values
-        txtaddColumn.text = "";
-        txtaddRow.text = "";
-        txtaddDepth.text = "";
-    });
-
-    btneditshelf.onPointerClickObservable.add(() => {
-        // Initialize GizmoManager
-        var gizmoManager = new GizmoManager(scene)
-        gizmoManager.boundingBoxGizmoEnabled = true
-        // Restrict gizmos to only spheres
-        gizmoManager.attachableMeshes = shelf
-        // Toggle gizmos with keyboard buttons
-        document.onkeydown = (e) => {
-            if (e.key == 'w') {
-                gizmoManager.positionGizmoEnabled = !gizmoManager.positionGizmoEnabled
-            }
-            if (e.key == 'e') {
-                gizmoManager.rotationGizmoEnabled = !gizmoManager.rotationGizmoEnabled
-            }
-            if (e.key == 'r') {
-                gizmoManager.scaleGizmoEnabled = !gizmoManager.scaleGizmoEnabled
-            }
-            if (e.key == 'q') {
-                gizmoManager.boundingBoxGizmoEnabled = !gizmoManager.boundingBoxGizmoEnabled
-            }
-        }
-    })
     // delete selected meshes
-    btndeleteshelf.onPointerClickObservable.add(() => {
+    btndelete.onPointerClickObservable.add(() => {
         if (currentMesh != null) {
             currentMesh.dispose();
             currentMesh = null;

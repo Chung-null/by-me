@@ -4,50 +4,52 @@ import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
 
-
-
 export async function makeWare(): Promise<Mesh> {
+    var startingWare;
+    var currentWare;
+    var outlineware;
+    var position = 1;
+    var ware;
+    var wares = [];
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#69"); //L91IFF#64, L91IFF#69
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#93");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
-    let warehouseInfo = advancedTexture.getControlByName("WarehouseInfo");
-    warehouseInfo.isVisible = false;
-    let conveyorbeltInfo = advancedTexture.getControlByName("ConveyorbeltInfo");
-    conveyorbeltInfo.isVisible = false;
-    let boxInfo = advancedTexture.getControlByName("BoxInfo");
-    boxInfo.isVisible = false;
-    let palletInfo = advancedTexture.getControlByName("PalletInfo");
-    palletInfo.isVisible = false;
     let location = advancedTexture.getControlByName("Location");
     location.isVisible = false;
     let listMenuShelf = advancedTexture.getControlByName("ListMenuShelf");
     listMenuShelf.isVisible = false;
-    let shelfWareInfo = advancedTexture.getControlByName("ShelfWareInfo");
-    shelfWareInfo.isVisible = false;
+    let listMenuBox = advancedTexture.getControlByName("ListMenuBox")
+    listMenuBox.isVisible = false;
+    let btndelete = advancedTexture.getControlByName("BtnDelete")
 
+    async function createWarehouse() {
+        // Import the pallet
+        const result = await SceneLoader.ImportMeshAsync(null, "warehouse/", "eton.obj", scene, function (container) {
+            // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
+        });
+        ware = result.meshes[0];
+        if (position != 1) {
+            ware.position.x += position;
+        }
+        else {
+            ware.position.x += 4;
+        }
+
+        position = ware.position.x + 4;
+
+
+        wares.push(ware);
+    }
+
+    //Add Warehouse
     let buttonWarehouse = advancedTexture.getControlByName("ButtonWarehouse");
-    buttonWarehouse.onPointerClickObservable.add(() => {
-        warehouseInfo.isVisible = true;
-        buttonWarehouse.isVisible = true;
+    buttonWarehouse.onPointerClickObservable.add(async() => {
+        const ware = await createWarehouse();
     });
 
-    let btnaddware = advancedTexture.getControlByName("BtnAddWare");
-    let btndeleteware = advancedTexture.getControlByName("BtnDeleteWare");
-    let btneditware = advancedTexture.getControlByName("BtnEditWare");
-    let btncloseware = advancedTexture.getControlByName("BtnCloseWare");
-
-    btncloseware.onPointerUpObservable.add(() => {
-        warehouseInfo.isVisible = false;
-        buttonWarehouse.isVisible = true;
-    });
-
-
-    var startingWare;
-    var currentWare;
-    var outlineware;
     var getGroundPosition = function () {
         var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (house) { return house == ground; });
         if (pickinfo.hit) {
@@ -83,12 +85,8 @@ export async function makeWare(): Promise<Mesh> {
     }
     var pointerUp = function () {
         if (startingWare) {
-            // currentMesh.material.wireframe = false;
-
             // // outline
-            // outline = currentMesh;
-            // outline.renderOutline = false;
-            // camera.attachControl(canvas, true);
+            camera.attachControl(canvas, true);
             startingWare = null;
             return;
         }
@@ -124,68 +122,8 @@ export async function makeWare(): Promise<Mesh> {
                 break;
         }
     });
-
-    var position = 1;
-    var ware;
-    var wares = [];
-
-    // ...
-
-    async function createWarehouse() {
-        const warehouse = await SceneLoader.ImportMeshAsync(
-            null,
-            "warehouse/",
-            "eton.obj",
-            scene,
-            function (container) {
-                // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
-            }
-        );
-        const ware = warehouse.meshes[0];
-        if (position != 1) {
-            ware.position.x += position;
-        } else {
-            ware.position.x += 4;
-        }
-
-        position = ware.position.x + 4;
-
-        wares.push(ware)
-    }
-
-    // ...
-
-    btnaddware.onPointerClickObservable.add(async () => {
-        const ware = await createWarehouse();
-        // Additional logic after creating the warehouse can be added here
-    });
-
-    // ...
-
-    btneditware.onPointerClickObservable.add(() => {
-        // Initialize GizmoManager
-        var gizmoManager = new GizmoManager(scene)
-        gizmoManager.boundingBoxGizmoEnabled = true
-        // Restrict gizmos to only spheres
-        gizmoManager.attachableMeshes = wares
-        // Toggle gizmos with keyboard buttons
-        document.onkeydown = (e) => {
-            if (e.key == 'w') {
-                gizmoManager.positionGizmoEnabled = !gizmoManager.positionGizmoEnabled
-            }
-            if (e.key == 'e') {
-                gizmoManager.rotationGizmoEnabled = !gizmoManager.rotationGizmoEnabled
-            }
-            if (e.key == 'r') {
-                gizmoManager.scaleGizmoEnabled = !gizmoManager.scaleGizmoEnabled
-            }
-            if (e.key == 'q') {
-                gizmoManager.boundingBoxGizmoEnabled = !gizmoManager.boundingBoxGizmoEnabled
-            }
-        }
-    })
     // delete selected meshes
-    btndeleteware.onPointerClickObservable.add(() => {
+    btndelete.onPointerClickObservable.add(() => {
         if (currentWare != null) {
             currentWare.dispose();
             currentWare = null;
