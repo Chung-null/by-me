@@ -3,6 +3,7 @@ import { scene, engine, camera, canvas } from './scene'
 import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
+import { handlers } from './api/handlers';
 
 
 
@@ -28,30 +29,36 @@ export async function makePallet(): Promise<Mesh> {
     let btndelete = advancedTexture.getControlByName("BtnDelete");
     let listexportbox = advancedTexture.getControlByName("ListExportBox");
     listexportbox.isVisible = false;
+    // handle API
+    let handler = new handlers()
 
-    async function createPallet() {
+    async function createPallet(position: Vector3) {
         // Import the pallet
         const result = await SceneLoader.ImportMeshAsync(null, "pallet/", "palleteton.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
         pallet = result.meshes[0];
-        if (position != 1) {
-            pallet.position.x += position;
-        }
-        else {
-            pallet.position.x += 4;
-        }
-
-        position = pallet.position.x + 4;
-
+        pallet.name = "pallet hehe"
+        pallet.position = position
 
         palletes.push(pallet);
+        return pallet
     }
 
     //Event click button Shelfinfo
     let buttonPallet = advancedTexture.getControlByName("ButtonPallet");
     buttonPallet.onPointerClickObservable.add(async() => {
-        let palet = await createPallet();
+        let positionPallet = new Vector3()
+        // Adjust the position of the box
+        if (position !== 1) {
+            positionPallet.x += position;
+        } else {
+            positionPallet.x += 4;
+        }
+
+        position = positionPallet.x + 4;
+        let palet = await createPallet(positionPallet);
+        handler.postPallet(palet.position.x,pallet.position.y, pallet.position.z)
     });
 
     var getGroundPosition = function () {
@@ -63,6 +70,9 @@ export async function makePallet(): Promise<Mesh> {
         return null;
     }
     var pointerDown = function (pallet) {
+        console.log(pallet)
+        console.log(palletes)
+        console.log(pallet.name, "plalelel")
         if (currentPallet) {
             // currentPallet.material.wireframe = false;
             // outlinepallet

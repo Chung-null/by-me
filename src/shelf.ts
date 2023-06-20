@@ -117,8 +117,8 @@ export async function makeShelf(): Promise<Mesh> {
         let addRow = parseInt(txtaddRow.text);
         let addColumn = parseInt(txtaddColumn.text);
         let addDepth = parseInt(txtaddDepth.text);
-        // let addWeightShelf = parseInt(txtWeightInfo.text);
-        // let addNameShlef = txtNameInfo.text
+        let addWeightShelf = parseInt(txtWeightInfo.text);
+        let addNameShelf = txtNameInfo.text
         // Import the mesh
         for (let i = 0; i < addRow; i++) {
             for (let j = 0; j < addColumn; j++) {
@@ -147,8 +147,11 @@ export async function makeShelf(): Promise<Mesh> {
 
             shelf.push(groupMesh);
             console.log("grouping");
+            let resultPost = await handler.postShelf(addNameShelf, addWeightShelf, addColumn, addRow, addDepth, groupMesh.position.x, groupMesh.position.y, groupMesh.position.z)
+            if (resultPost.status == 200) {
+                
+            }
         }
-
     })
     btncloseshelf.onPointerUpObservable.add(() => {
         listMenuShelf.isVisible = false;
