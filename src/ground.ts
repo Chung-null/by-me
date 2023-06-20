@@ -19,7 +19,7 @@ function createGround(): Mesh {
     var grid = new GridMaterial("grid", scene);
     grid.gridRatio = 10;
     ground.material = grid;
-    grid.co = new Color3 (1, 0, 0);
+   
 
 
     return ground
