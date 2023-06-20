@@ -74,7 +74,6 @@ export class box {
               }
             ],
             "field_name": this.name,
-            "field_export_date": this.export_date,
             "field_x": this.x,
             "field_y": this.y,
             "field_z": this.z

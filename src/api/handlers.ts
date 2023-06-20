@@ -11,7 +11,7 @@ enum TABLE {
 export class handlers {
     // Sử dụng middleware cors để cấu hình CORS
 
-    readonly defaultUrl = 'http://localhost/Eton-Web3D-API/node'
+    readonly defaultUrl = 'http://localhost/node'
     readonly defaultType = '?_format=json'
     constructor() { }
     // sử dụng get / lấy dữ liệu
@@ -68,7 +68,7 @@ export class handlers {
 
     // sử dụng post/ tải lên dữ liệu
     // shelf
-    async postShelf(name: String, weight: Number, x: Number, y: Number, z: Number) {
+    async postShelf(name: String, weight: Number, colums: Number, rows: Number, depth: Number, x: Number, y: Number, z: Number) {
         let shelfPost = new shelf(name, weight, x, y, z)
         let dataPost = shelfPost.getShelf()
         if (await this.checkConstraintShelf(name)) {
