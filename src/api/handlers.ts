@@ -11,7 +11,7 @@ enum TABLE {
 export class handlers {
     // Sử dụng middleware cors để cấu hình CORS
 
-    readonly defaultUrl = 'http://localhost/node'
+    readonly defaultUrl = 'https://dev-web3d-api.eton.vn/node'
     readonly defaultType = '?_format=json'
     constructor() { }
     // sử dụng get / lấy dữ liệu

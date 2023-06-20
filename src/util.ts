@@ -18,3 +18,22 @@ export function getCurrentDate(): String {
     return formattedDate
 
 }
+let haveIt = [];
+
+export function generateUniqueRandom(maxNr) {
+    //Generate random number
+    let random = Number((Math.random() * maxNr).toFixed());
+
+    if(!haveIt.includes(random)) {
+        haveIt.push(random);
+        return random;
+    } else {
+        if(haveIt.length < maxNr) {
+          //Recursively generate number
+         return  generateUniqueRandom(maxNr);
+        } else {
+          console.log('No more numbers available.')
+          return false;
+        }
+    }
+}

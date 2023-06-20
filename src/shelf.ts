@@ -4,6 +4,7 @@ import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { InputText } from '@babylonjs/gui';
 import { ground } from './ground';
+import { handlers } from './api/handlers';
 
 export async function makeShelf(): Promise<Mesh> {
     var startingPoint;
@@ -116,7 +117,8 @@ export async function makeShelf(): Promise<Mesh> {
     let txtaddColumn = <InputText>advancedTexture.getControlByName("InputTextColumn");
     let txtaddRow = <InputText>advancedTexture.getControlByName("InputTextRow");
     let txtaddDepth = <InputText>advancedTexture.getControlByName("InputTextDepth");
-
+    // handle db 
+    let handler = new handlers()
     var shelfMaterial = new StandardMaterial("shelfmat", scene);
     // Function to create a single shelf
     async function createShelf(offsetX, offsetY, offsetZ) {
@@ -133,8 +135,8 @@ export async function makeShelf(): Promise<Mesh> {
         mesh.position.y = offsetY;
         mesh.position.z = offsetZ;
         mesh.material = shelfMaterial;
-
         shelf.push(mesh);
+        // handler.postShelf(name)
     }
     buttonShelfware.onPointerClickObservable.add(() => {
         listMenuShelf.isVisible = true;
@@ -397,32 +399,38 @@ export async function makeShelf(): Promise<Mesh> {
             }
         } else if (eventData.type === PointerEventTypes.POINTERUP) {
             if (startPointerPosition) {
-                // set endPointerPosition with pointer up event
-                const endPointerPosition: Position = { x: scene.pointerX, y: scene.pointerY }
-                // select spheres using array filter method
-                const selectedSpheres = shelf.filter(meshe =>
-                    isTargetIn(
-                        startPointerPosition,
-                        endPointerPosition,
-                        meshe.getAbsolutePosition(),
-                        camera
+                try {
+                    // set endPointerPosition with pointer up event
+                    const endPointerPosition: Position = { x: scene.pointerX, y: scene.pointerY }
+                    // select spheres using array filter method
+                    const selectedSpheres = shelf.filter(meshe =>
+                        isTargetIn(
+                            startPointerPosition,
+                            endPointerPosition,
+                            meshe.getAbsolutePosition(),
+                            camera
+                        )
                     )
-                )
 
-                // initialize startPointerPosition with null
-                startPointerPosition = null
-                // initialize dragBox's style with default one wich doesn't include width and height
-                dragBox.style.cssText = defStyle
+                    // initialize startPointerPosition with null
+                    startPointerPosition = null
+                    // initialize dragBox's style with default one wich doesn't include width and height
+                    dragBox.style.cssText = defStyle
 
-                // log selected spheres
-                console.log('selectedSpheres: ', selectedSpheres)
-                // alert with selected spheres counts
-                // alert(`${selectedSpheres.length} ${selectedSpheres.length > 1 ? 'spheres are' : 'sphere is'} selected!`)
+                    // log selected spheres
+                    console.log('selectedSpheres: ', selectedSpheres)
+                    // alert with selected spheres counts
+                    // alert(`${selectedSpheres.length} ${selectedSpheres.length > 1 ? 'spheres are' : 'sphere is'} selected!`)
 
-                selectedMeshOld.forEach(removeHinglightLayer);
-                selectedMeshOld = selectedSpheres;
+                    selectedMeshOld.forEach(removeHinglightLayer);
+                    selectedMeshOld = selectedSpheres;
 
-                selectedSpheres.forEach(HinglightLayer);
+                    selectedSpheres.forEach(HinglightLayer);
+                }
+                catch(e) {
+                    //TODO: fix 
+                    console.log(e)
+                }
             }
         }
     })

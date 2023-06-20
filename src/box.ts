@@ -1,10 +1,10 @@
-import { Color3, GizmoManager, Mesh, MeshBuilder, PhysicsImpostor, PointerEventTypes, PositionGizmo, SceneLoader, UtilityLayerRenderer, Vector3 } from '@babylonjs/core'
+import { AbstractMesh, Color3, GizmoManager, Mesh, MeshBuilder, PhysicsImpostor, PointerEventTypes, PositionGizmo, SceneLoader, UtilityLayerRenderer, Vector3 } from '@babylonjs/core'
 import { scene, engine, camera, canvas } from './scene'
 import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
 import { InputText } from '@babylonjs/gui';
-
+import { generateUniqueRandom } from './util';
 
 
 export async function makeBox(): Promise<Mesh> {
@@ -17,7 +17,7 @@ export async function makeBox(): Promise<Mesh> {
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
 
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#90"); //L91IFF#73, L91IFF#76, L91IFF#75
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#95"); //L91IFF#73, L91IFF#76, L91IFF#75
 
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
@@ -58,7 +58,8 @@ export async function makeBox(): Promise<Mesh> {
         // Import the box
         const result = await SceneLoader.ImportMeshAsync(null, "box/", "boxeton.obj", scene);
         const box = result.meshes[0];
-        
+        const randomNumber = generateUniqueRandom(Number.MAX_SAFE_INTEGER)
+        box.name = "box" + randomNumber
         // Adjust the position of the box
         if (position !== 1) {
             box.position.x += position;
@@ -92,49 +93,66 @@ export async function makeBox(): Promise<Mesh> {
         return null;
     }
 
-    var pointerDown = function (box) {
-        if (currentBox) {
+    var pointerDown = function (box: AbstractMesh) {
+        try {
+            if (box) {
+                if (box.name.includes("box")) {
+                    if (currentBox) {
 
-            // currentBox.material.wireframe = false;
-            // outlinebox
-            outlinebox = currentBox;
-            outlinebox.renderOutline = false;
-            location.isVisible = false
-            txtXposition.text = "";
-            txtYposition.text = "";
-            txtZposition.text = "";
-            listexportbox.isVisible = false
+                        // currentBox.material.wireframe = false;
+                        // outlinebox
+                        outlinebox = currentBox;
+                        outlinebox.renderOutline = false;
+                        location.isVisible = false
+                        txtXposition.text = "";
+                        txtYposition.text = "";
+                        txtZposition.text = "";
+                        listexportbox.isVisible = false
+                    }
+
+                    currentBox = box;
+                    // outlinebox
+                    outlinebox = currentBox;
+                    outlinebox.outlineWidth = 0.2;
+                    outlinebox.outlineColor = Color3.Green();
+                    outlinebox.renderOutline = true;
+
+                    startingBox = getGroundPosition();
+                    if (startingBox) { // we need to disconnect camera from canvas
+                        setTimeout(function () {
+                            // camera.detachControl(canvas);
+                        }, 0);
+
+                    }
+                }
+            }
         }
-
-        currentBox = box;
-        // outlinebox
-        outlinebox = currentBox;
-        outlinebox.outlineWidth = 0.2;
-        outlinebox.outlineColor = Color3.Green();
-        outlinebox.renderOutline = true;
-
-        startingBox = getGroundPosition();
-        if (startingBox) { // we need to disconnect camera from canvas
-            setTimeout(function () {
-                // camera.detachControl(canvas);
-            }, 0);
-
+        catch(e) {
+            console.log(e)
         }
-
     }
 
-    var pointerUp = function () {
-        if (startingBox) {
-            camera.attachControl(canvas, true);
-            startingBox = null;
+    var pointerUp = function (box: AbstractMesh) {
+        try {
+            if (box) {
+                if (box.name.includes("box")) {
+                    if (startingBox) {
+                        camera.attachControl(canvas, true);
+                        startingBox = null;
 
-            location.isVisible = true;
-            txtXposition.text = currentBox.position.x.toFixed(2);
-            txtYposition.text = currentBox.position.y.toFixed(2);
-            txtZposition.text = currentBox.position.z.toFixed(2);
+                        location.isVisible = true;
+                        txtXposition.text = currentBox.position.x.toFixed(2);
+                        txtYposition.text = currentBox.position.y.toFixed(2);
+                        txtZposition.text = currentBox.position.z.toFixed(2);
 
-            listexportbox.isVisible = true
-            return;
+                        listexportbox.isVisible = true
+                        return;
+                    }
+                }
+            }
+        }
+        catch(e) {
+            console.log(e)
         }
     }
 
@@ -187,7 +205,7 @@ export async function makeBox(): Promise<Mesh> {
 
                 break;
             case PointerEventTypes.POINTERUP:
-                pointerUp();
+                pointerUp(pointerInfo.pickInfo.pickedMesh);
                 break;
             case PointerEventTypes.POINTERMOVE:
                 pointerMove();
