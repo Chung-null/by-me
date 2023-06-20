@@ -5,12 +5,13 @@ import * as GUI from "@babylonjs/gui";
 import { InputText } from '@babylonjs/gui';
 import { ground } from './ground';
 import { handlers } from './api/handlers';
+import { generateUniqueRandom } from './util';
 
 export async function makeShelf(): Promise<Mesh> {
     var startingPoint;
     var currentMesh;
     var outline;
-    var meshs;
+    var mesh;
     var shelf = [];
     let offsetX = 0;
     let offsetY = 0;
@@ -51,7 +52,7 @@ export async function makeShelf(): Promise<Mesh> {
     }
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#99");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#100");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -63,7 +64,7 @@ export async function makeShelf(): Promise<Mesh> {
     listMenuBox.isVisible = false;
     let listeditshelf = advancedTexture.getControlByName("ListEditShelf");
     listeditshelf.isVisible = false;
-    
+
 
     let buttonShelfware = advancedTexture.getControlByName("ButtonShelfware");
     let colorpickershelf = advancedTexture.getControlByName("ColorPicker") as GUI.ColorPicker;
@@ -81,7 +82,7 @@ export async function makeShelf(): Promise<Mesh> {
     let txtZposition = <InputText>advancedTexture.getControlByName("InputTextZ");
     //Get Info Shelf
     let txtNameInfo = <InputText>advancedTexture.getControlByName("InputNameShelfinfo");
-    let txtWeightInfo = <InputText>advancedTexture.getControlByName("InputShelfinfo");
+    let txtWeightInfo = <InputText>advancedTexture.getControlByName("InputWeightShelfinfo");
     let txtaddColumn = <InputText>advancedTexture.getControlByName("InputTextColumn");
     let txtaddRow = <InputText>advancedTexture.getControlByName("InputTextRow");
     let txtaddDepth = <InputText>advancedTexture.getControlByName("InputTextDepth");
@@ -93,10 +94,11 @@ export async function makeShelf(): Promise<Mesh> {
         const result = await SceneLoader.ImportMeshAsync(
             null,
             "shelf/",
-            "shelfeton.obj",
+            "shelfeton1.obj",
             scene,
             function (container) { }
         );
+        const randomNumber = generateUniqueRandom(Number.MAX_SAFE_INTEGER)
 
         let mesh = result.meshes[0];
         mesh.position.x = offsetX;
@@ -105,6 +107,8 @@ export async function makeShelf(): Promise<Mesh> {
         mesh.material = shelfMaterial;
         shelf.push(mesh);
         // handler.postShelf(name)
+
+        return mesh
     }
     buttonShelfware.onPointerClickObservable.add(() => {
         listMenuShelf.isVisible = true;
@@ -152,7 +156,7 @@ export async function makeShelf(): Promise<Mesh> {
             console.log("grouping");
             let resultPost = await handler.postShelf(addNameShelf, addWeightShelf, addColumn, addRow, addDepth, groupMesh.position.x, groupMesh.position.y, groupMesh.position.z)
             if (resultPost.status == 200) {
-                
+
             }
         }
     })
@@ -168,57 +172,72 @@ export async function makeShelf(): Promise<Mesh> {
 
         return null;
     }
-    var pointerDown = function (mesh) {
-        if (currentMesh) {
-            // outline
-            outline = currentMesh;
-            outline.renderOutline = false;
-            location.isVisible = false
-            txtXposition.text = "";
-            txtYposition.text = "";
-            txtZposition.text = "";
+    var pointerDown = function (mesh: AbstractMesh) {
+        try {
+            if (mesh) {
+                if (mesh.name.toLowerCase().includes("shelf")) {
+                    if (currentMesh) {
+                        // outline
+                        outline = currentMesh;
+                        outline.renderOutline = false;
+                        location.isVisible = false
+                        txtXposition.text = "";
+                        txtYposition.text = "";
+                        txtZposition.text = "";
 
+                        listeditshelf.isVisible = false;
+
+                    }
+
+
+                    currentMesh = mesh;
+                    // outline
+                    outline = currentMesh;
+                    outline.outlineWidth = 0.2;
+                    outline.outlineColor = Color3.Green();
+                    outline.renderOutline = true;
+
+                    startingPoint = getGroundPosition();
+                    if (startingPoint) { // we need to disconnect camera from canvas
+                        setTimeout(function () {
+                            camera.detachControl(canvas);
+                        }, 0);
+
+                    }
+                }
+                else {
+
+                }
+            }
         }
-        
-
-        currentMesh = mesh;
-        // outline
-        outline = currentMesh;
-        outline.outlineWidth = 0.2;
-        outline.outlineColor = Color3.Green();
-        outline.renderOutline = true;
-
-        startingPoint = getGroundPosition();
-        if (startingPoint) { // we need to disconnect camera from canvas
-            setTimeout(function () {
-                camera.detachControl(canvas);
-            }, 0);
-
+        catch (e) {
+            console.log(e)
         }
-
     }
-    var pointerUp = function () {
-        if (startingPoint) {
-            // currentMesh.material.wireframe = false;
+    var pointerUp = function (mesh: AbstractMesh) {
+        try {
+            if (startingPoint) {
+                // currentMesh.material.wireframe = false;
 
-            // // outline
-            outline = currentMesh;
-            outline.renderOutline = false;
-            camera.attachControl(canvas, true)
+                // // outline
+                outline = currentMesh;
+                outline.renderOutline = false;
+                camera.attachControl(canvas, true)
 
-            location.isVisible = true;
-            txtXposition.text = currentMesh.position.x.toFixed(2);
-            txtYposition.text = currentMesh.position.y.toFixed(2);
-            txtZposition.text = currentMesh.position.z.toFixed(2);
+                location.isVisible = true;
+                txtXposition.text = currentMesh.position.x.toFixed(2);
+                txtYposition.text = currentMesh.position.y.toFixed(2);
+                txtZposition.text = currentMesh.position.z.toFixed(2);
 
-            var index = shelf.indexOf(currentMesh);
-            // console.log("index " + index);
-            // console.log("position " + currentMesh.position);
+                listeditshelf.isVisible = true;
 
-            camera.attachControl(canvas, true);
-            startingPoint = null;
+                camera.attachControl(canvas, true);
+                startingPoint = null;
 
-            return;
+                return;
+            }
+        } catch (e) {
+            console.log(e)
         }
     }
     var pointerMove = function () {
@@ -254,6 +273,7 @@ export async function makeShelf(): Promise<Mesh> {
                         txtXposition.text = "";
                         txtYposition.text = "";
                         txtZposition.text = "";
+                        listeditshelf.isVisible = false;
 
                     }
                     // console.log("down");
@@ -271,7 +291,7 @@ export async function makeShelf(): Promise<Mesh> {
 
                 break;
             case PointerEventTypes.POINTERUP:
-                pointerUp();
+                pointerUp(pointerInfo.pickInfo.pickedMesh);
                 break;
             case PointerEventTypes.POINTERMOVE:
                 pointerMove();
@@ -286,17 +306,6 @@ export async function makeShelf(): Promise<Mesh> {
         }
     });
 
-    const checkdragboxExits = function () {
-        if (document.querySelector('#canvasZone #_dragBox') !== null) {
-            // exist
-            return true;
-        } else {
-            // not exist
-            return false;
-        }
 
-    }
-
-
-    return meshs
+    return mesh
 }

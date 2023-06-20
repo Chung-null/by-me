@@ -19,7 +19,7 @@ export async function makeBox(): Promise<Mesh> {
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
 
 
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#99"); //L91IFF#73, L91IFF#76, L91IFF#75
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#100"); //L91IFF#73, L91IFF#76, L91IFF#75
 
 
 

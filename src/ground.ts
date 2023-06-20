@@ -13,8 +13,7 @@ export function makeGround(): void {
 }
 function createGround(): Mesh {
     var ground = Mesh.CreateGround("ground1", 200, 200, 0, scene);
-    //Tạo một vật liệu StandardMaterial mới
-    var material = new StandardMaterial("groundMaterial", scene);
+   
     //create grid 
     var grid = new GridMaterial("grid", scene);
     grid.gridRatio = 10;
