@@ -144,7 +144,7 @@ export async function makeShelf(): Promise<Mesh> {
 
     colorpickershelf.value = shelfMaterial.diffuseColor;
     buttonShelfware.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-    colorpickershelf.onValueChangedObservable.add(function (value) { 
+    colorpickershelf.onValueChangedObservable.add(function (value) {
         shelfMaterial.diffuseColor.copyFrom(value);
     });
     btnsaveshelf.onPointerClickObservable.add(async () => {
@@ -173,6 +173,17 @@ export async function makeShelf(): Promise<Mesh> {
         txtaddColumn.text = "";
         txtaddRow.text = "";
         txtaddDepth.text = "";
+        if (shelf != null) {
+
+            var groupMesh = Mesh.MergeMeshes(shelf);
+
+            // remove the same element
+            shelf = shelf.filter(n => !shelf.includes(n));
+
+            shelf.push(groupMesh);
+            console.log("grouping");
+        }
+
     })
     btncloseshelf.onPointerUpObservable.add(() => {
         listMenuShelf.isVisible = false;
@@ -197,10 +208,10 @@ export async function makeShelf(): Promise<Mesh> {
             txtZposition.text = "";
 
         }
-        toggledMesh = checkdragboxExits(); // if (toggledMesh == false) do nothing : toggledMesh = true remove
-        if (toggledMesh) {
-            toggledMesh = toggleDrabbox(true);
-        }
+        // toggledMesh = checkdragboxExits(); // if (toggledMesh == false) do nothing : toggledMesh = true remove
+        // if (toggledMesh) {
+        //     toggledMesh = toggleDrabbox(true);
+        // }
 
         currentMesh = mesh;
         // outline
@@ -306,28 +317,6 @@ export async function makeShelf(): Promise<Mesh> {
             currentMesh = null;
         }
     });
-    btnselect.onPointerClickObservable.add(() => {
-        toggledMesh = checkdragboxExits();
-        toggledMesh = toggleDrabbox(toggledMesh);
-    })
-
-    let toggledMesh = false;
-
-    const toggleDrabbox = function (toggle) {
-
-        if (!toggle) {
-            setTimeout(function () {
-                camera.detachControl(canvas);
-            }, 0);
-            document.querySelector("#canvasZone").appendChild(dragBox);
-            return true;
-        }
-        else {
-            camera.attachControl(canvas, true);
-            document.querySelector("#canvasZone").removeChild(dragBox);
-            return false;
-        }
-    }
 
     const checkdragboxExits = function () {
         if (document.querySelector('#canvasZone #_dragBox') !== null) {
@@ -339,111 +328,7 @@ export async function makeShelf(): Promise<Mesh> {
         }
 
     }
-    btngroup.onPointerClickObservable.add(() => {
 
-        if (selectedMeshOld != null) {
-
-            var groupMesh = Mesh.MergeMeshes(selectedMeshOld);
-
-            // remove the same element
-            shelf = shelf.filter(n => !selectedMeshOld.includes(n));
-
-            shelf.push(groupMesh);
-            console.log("grouping");
-        }
-
-    })
-
-    // initialize startPointerPosition with null
-    let startPointerPosition = null
-
-    // find a div element with id _dragBox, and if you cannot find create it
-    const dragBox =
-        (document.querySelector('#_dragBox') as HTMLDivElement) ||
-        document.createElement('div')
-    dragBox.id = '_dragBox'
-    // default style of the dragBox
-    const defStyle = 'background-color: gray; position: absolute; opacity: 0.3;'
-    dragBox.style.cssText = defStyle
-
-        // make the position of div with id canvasZone relative, so that the dragBox can refer to it
-        ; (document.querySelector('#canvasZone') as HTMLElement).style.position =
-            'relative'
-        // set the canvasZone to be the parent of dragBox
-        ; (document.querySelector('#canvasZone') as HTMLElement).appendChild(dragBox)
-        ; (document.querySelector('#canvasZone') as HTMLElement).removeChild(dragBox)
-
-    let selectedMeshOld = []
-    scene.onPointerObservable.add(eventData => {
-        if (eventData.type === PointerEventTypes.POINTERDOWN) {
-            // set startPointerPosition with pointer down event
-            startPointerPosition = { x: scene.pointerX, y: scene.pointerY }
-        } else if (eventData.type === PointerEventTypes.POINTERMOVE) {
-            if (dragBox && startPointerPosition) {
-                // set currentPointerPosition with every pointer move event
-                const currentPointerPosition: Position = {
-                    x: scene.pointerX,
-                    y: scene.pointerY,
-                }
-
-                // compute min and max of screen XY with start/currentPointerPosition
-                // to set left, top, width and height of the dragBox
-                const minX = Math.min(startPointerPosition.x, currentPointerPosition.x)
-                const minY = Math.min(startPointerPosition.y, currentPointerPosition.y)
-                const maxX = Math.max(startPointerPosition.x, currentPointerPosition.x)
-                const maxY = Math.max(startPointerPosition.y, currentPointerPosition.y)
-
-                // update dragBox's style
-                dragBox.style.cssText = `${defStyle} left: ${minX}px; top: ${minY}px; width: ${maxX -
-                    minX}px; height: ${maxY - minY}px;`
-            }
-        } else if (eventData.type === PointerEventTypes.POINTERUP) {
-            if (startPointerPosition) {
-                try {
-                    // set endPointerPosition with pointer up event
-                    const endPointerPosition: Position = { x: scene.pointerX, y: scene.pointerY }
-                    // select spheres using array filter method
-                    const selectedSpheres = shelf.filter(meshe =>
-                        isTargetIn(
-                            startPointerPosition,
-                            endPointerPosition,
-                            meshe.getAbsolutePosition(),
-                            camera
-                        )
-                    )
-
-                    // initialize startPointerPosition with null
-                    startPointerPosition = null
-                    // initialize dragBox's style with default one wich doesn't include width and height
-                    dragBox.style.cssText = defStyle
-
-                    // log selected spheres
-                    console.log('selectedSpheres: ', selectedSpheres)
-                    // alert with selected spheres counts
-                    // alert(`${selectedSpheres.length} ${selectedSpheres.length > 1 ? 'spheres are' : 'sphere is'} selected!`)
-
-                    selectedMeshOld.forEach(removeHinglightLayer);
-                    selectedMeshOld = selectedSpheres;
-
-                    selectedSpheres.forEach(HinglightLayer);
-                }
-                catch(e) {
-                    //TODO: fix 
-                    console.log(e)
-                }
-            }
-        }
-    })
-
-    var hl = new HighlightLayer("hl1", scene);
-    function HinglightLayer(item, index) {
-        // namelist += index + ": " + item + "<br>";
-        hl.addMesh(item, Color3.Green());
-
-    }
-    function removeHinglightLayer(item) {
-        hl.removeMesh(item);
-    }
 
     return meshs
 }
