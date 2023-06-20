@@ -51,7 +51,7 @@ export async function makeShelf(): Promise<Mesh> {
     }
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#97");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#99");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -61,6 +61,9 @@ export async function makeShelf(): Promise<Mesh> {
     listMenuShelf.isVisible = false;
     let listMenuBox = advancedTexture.getControlByName("ListMenuBox")
     listMenuBox.isVisible = false;
+    let listeditshelf = advancedTexture.getControlByName("ListEditShelf");
+    listeditshelf.isVisible = false;
+    
 
     let buttonShelfware = advancedTexture.getControlByName("ButtonShelfware");
     let colorpickershelf = advancedTexture.getControlByName("ColorPicker") as GUI.ColorPicker;
@@ -173,10 +176,7 @@ export async function makeShelf(): Promise<Mesh> {
             txtZposition.text = "";
 
         }
-        // toggledMesh = checkdragboxExits(); // if (toggledMesh == false) do nothing : toggledMesh = true remove
-        // if (toggledMesh) {
-        //     toggledMesh = toggleDrabbox(true);
-        // }
+        
 
         currentMesh = mesh;
         // outline
