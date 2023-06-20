@@ -46,7 +46,7 @@ function createLight(scene: Scene): void {
 }
 
 function setBackground(scene: Scene): void {
-    scene.clearColor = new Color4(0, 0, 0, 1)
+    scene.clearColor = new Color4(1,1,1,1)
 }
 
 function createCanvas() {

@@ -19,39 +19,6 @@ export async function makeShelf(): Promise<Mesh> {
         x: number
         y: number
     }
-    const isTargetin = (
-        startPosition: Position,
-        endPosition: Position,
-        target: Vector3,
-        camera: Camera
-    ): boolean => {
-        // get the screen XY of the target, converted from its world coordinate
-        const targetScreenPosition = Vector3.Project(
-            target,
-            Matrix.IdentityReadOnly,
-            scene.getTransformMatrix(),
-            camera.viewport.toGlobal(
-                scene.getEngine().getRenderWidth(),
-                scene.getEngine().getRenderHeight()
-            )
-        )
-
-        const minX = Math.min(startPosition.x, endPosition.x)
-        const minY = Math.min(startPosition.y, endPosition.y)
-        const maxX = Math.max(startPosition.x, endPosition.x)
-        const maxY = Math.max(startPosition.y, endPosition.y)
-
-        // check if the target's screen XY is inside of the dragBox XY range or not
-        if (
-            targetScreenPosition.x >= minX &&
-            targetScreenPosition.x <= maxX &&
-            targetScreenPosition.y >= minY &&
-            targetScreenPosition.y <= maxY
-        ) {
-            return true
-        }
-        return false
-    }
     // check mesh in drag-area or not
     const isTargetIn = (startPosition, endPosition, target, camera) => {
         // get the screen XY of the target, converted from its world coordinate
@@ -83,7 +50,7 @@ export async function makeShelf(): Promise<Mesh> {
     }
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#95");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#97");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -100,8 +67,6 @@ export async function makeShelf(): Promise<Mesh> {
     listexportbox.isVisible = false;
 
 
-    let btnselect = advancedTexture.getControlByName("BtnSelect");
-    let btngroup = advancedTexture.getControlByName("BtnGroup");
     let btnsaveshelf = advancedTexture.getControlByName("BtnSaveShelf");
     let btndelete = advancedTexture.getControlByName("BtnDelete");
     let btncloseshelf = advancedTexture.getControlByName("BtnCloseShelf");
