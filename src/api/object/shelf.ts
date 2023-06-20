@@ -5,16 +5,18 @@ export class shelf {
     private x: [{value: Number}]
     private y: [{value: Number}]
     private z: [{value: Number}]
-    public constructor(name?: String, weight?: Number, x?: Number, y?: Number, z?: Number, id?: Number);
-    public constructor(name?: String, weight?: Number, x?: Number, y?: Number, z?: Number, id?: Number) {
+    private columns: [{value: Number}]
+    private rows: [{value: Number}]
+    private depth: [{value: Number}]
+    public constructor(name?: String, weight?: Number, columns?: Number, rows?: Number, depth?: Number, x?: Number, y?: Number, z?: Number, id?: Number);
+    public constructor(name?: String, weight?: Number, columns?: Number, rows?: Number, depth?: Number, x?: Number, y?: Number, z?: Number, id?: Number) {
         if (id) {
             this.setId = id
         }
         this.setName = name
         this.setWeight = weight
-        this.setX = x
-        this.setY = y
-        this.setZ = z
+        this.setPosition(x, y, z)
+        this.setParameter(columns, rows, depth)
     };
     public set setId(value : Number) {
         this.id = value;
@@ -34,13 +36,25 @@ export class shelf {
     public set setZ(value : Number) {
         this.z = [{value: value}];
     }
-    
+    public set setColumns(value : Number) {
+        this.columns = [{value: value}];
+    }
+    public set setRows(value : Number) {
+        this.rows = [{value: value}];
+    }
+    public set setDepth(value : Number) {
+        this.depth = [{value: value}];
+    }
     public setPosition(x: Number, y: Number, z: Number) {
         this.setX = x
         this.setY = y
         this.setZ = z
     }
-    
+    public setParameter(columns: Number, rows: Number, depth: Number) {
+        this.setColumns = columns
+        this.setRows = rows
+        this.setDepth = depth
+    }
 
     public get getId() : Number {
         return this.id
@@ -79,7 +93,10 @@ export class shelf {
             "field_weightt": this.weight,
             "field_x": this.x,
             "field_y": this.y,
-            "field_z": this.z
+            "field_z": this.z,
+            "field_columns": this.columns,
+            "field_rows": this.rows,
+            "field_depth": this.depth
         }
     }
     public getPutNameShelf() : {} {
@@ -89,11 +106,6 @@ export class shelf {
                 "target_id": "shelf",
                 "target_type": "node_type"
                 }
-            ],
-            "title": [
-              {
-              "value": "1"
-              }
             ],
             "field_name": this.name
         }
@@ -105,11 +117,6 @@ export class shelf {
                 "target_id": "shelf",
                 "target_type": "node_type"
                 }
-            ],
-            "title": [
-              {
-              "value": "1"
-              }
             ],
             "field_x": this.x,
             "field_y": this.y,
@@ -124,12 +131,20 @@ export class shelf {
                 "target_type": "node_type"
                 }
             ],
-            "title": [
-              {
-              "value": "1"
-              }
-            ],
             "field_weightt": this.weight
+        }
+    }
+    public getPutParameter() : {} {
+        return {
+            "type": [
+                {
+                "target_id": "shelf",
+                "target_type": "node_type"
+                }
+            ],
+            "field_columns": this.columns,
+            "field_rows": this.rows,
+            "field_depth": this.depth
         }
     }
 }
