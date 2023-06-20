@@ -5,6 +5,7 @@ import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
 import { InputText } from '@babylonjs/gui';
 import { generateUniqueRandom } from './util';
+import { handlers } from './api/handlers';
 
 
 export async function makeBox(): Promise<Mesh> {
@@ -49,33 +50,38 @@ export async function makeBox(): Promise<Mesh> {
 
     //Get Info Box
     let txtBoxNameInfo = <InputText>advancedTexture.getControlByName("InputNameBoxinfo");
-    let txtImportInfo = <InputText>advancedTexture.getControlByName("InputImportBoxinfo");
-    let txtExportInfo = <InputText>advancedTexture.getControlByName("InputExportBoxinfo");
+    // let txtImportInfo = <InputText>advancedTexture.getControlByName("InputImportBoxinfo");
+    // let txtExportInfo = <InputText>advancedTexture.getControlByName("InputExportBoxinfo");
 
-
+    //  handle API
+    let handler = new handlers()
     // Function to create a box and return it as a Promise
-    async function createBox() {
+    async function createBox(position: Vector3) {
         // Import the box
         const result = await SceneLoader.ImportMeshAsync(null, "box/", "boxeton.obj", scene);
         const box = result.meshes[0];
         const randomNumber = generateUniqueRandom(Number.MAX_SAFE_INTEGER)
-        box.name = "box" + randomNumber
-        // Adjust the position of the box
-        if (position !== 1) {
-            box.position.x += position;
-        } else {
-            box.position.x += 4;
-        }
-
-        position = box.position.x + 4;
+        console.log(box.name , "heheh")
+        box.position = position
 
         boxes.push(box);
-
+        return box
     }
 
     // Event handler for the "Add Box" button
     btnsaveinfobox.onPointerClickObservable.add(async () => {
-        const box = await createBox();
+        const nameBox = txtBoxNameInfo.text
+        let positionBox = new Vector3()
+        // Adjust the position of the box
+        if (position !== 1) {
+            positionBox.x += position;
+        } else {
+            positionBox.x += 4;
+        }
+
+        position = positionBox.x + 4;
+        const box = await createBox(positionBox);
+        handler.postBox(nameBox, box.position.x, box.position.y, box.position.z)
         // You can perform additional actions with the created box if needed
     });
 
@@ -96,7 +102,7 @@ export async function makeBox(): Promise<Mesh> {
     var pointerDown = function (box: AbstractMesh) {
         try {
             if (box) {
-                if (box.name.includes("box")) {
+                if (box.name.includes("Cube.022")) {
                     if (currentBox) {
 
                         // currentBox.material.wireframe = false;
@@ -134,21 +140,17 @@ export async function makeBox(): Promise<Mesh> {
 
     var pointerUp = function (box: AbstractMesh) {
         try {
-            if (box) {
-                if (box.name.includes("box")) {
-                    if (startingBox) {
-                        camera.attachControl(canvas, true);
-                        startingBox = null;
+            if (startingBox) {
+                camera.attachControl(canvas, true);
+                startingBox = null;
 
-                        location.isVisible = true;
-                        txtXposition.text = currentBox.position.x.toFixed(2);
-                        txtYposition.text = currentBox.position.y.toFixed(2);
-                        txtZposition.text = currentBox.position.z.toFixed(2);
+                location.isVisible = true;
+                txtXposition.text = currentBox.position.x.toFixed(2);
+                txtYposition.text = currentBox.position.y.toFixed(2);
+                txtZposition.text = currentBox.position.z.toFixed(2);
 
-                        listexportbox.isVisible = true
-                        return;
-                    }
-                }
+                listexportbox.isVisible = true
+                return;
             }
         }
         catch(e) {

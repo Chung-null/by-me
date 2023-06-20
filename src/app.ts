@@ -27,6 +27,9 @@ async function main(): Promise<void> {
     makeBox()
     // run the main render loop
     engine.runRenderLoop(() => scene.render())
+    window.addEventListener("resize", ()=>{
+        engine.resize()
+    })
 }
 
 

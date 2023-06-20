@@ -3,6 +3,7 @@ import { scene, engine, camera, canvas } from './scene'
 import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
+import { handlers } from './api/handlers';
 
 
 export async function makeConveyor(): Promise<Mesh> {
@@ -27,28 +28,33 @@ export async function makeConveyor(): Promise<Mesh> {
     let btndelete = advancedTexture.getControlByName("BtnDelete")
     let listexportbox = advancedTexture.getControlByName("ListExportBox");
     listexportbox.isVisible = false;
+    // handle API
+    let handler = new handlers()
 
-
-
-    async function createConveyor() {
+    async function createConveyor(position: Vector3) {
         const conveyorhouse = await SceneLoader.ImportMeshAsync(null, "conveyor/", "conveyor.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
         const conveyor = conveyorhouse.meshes[0];
-        if (position != 1) {
-            conveyor.position.x += position;
-        } else {
-            conveyor.position.x += 4;
-        }
-
-        position = conveyor.position.x + 4;
+        conveyor.position = position
 
         palletes.push(conveyor);
+        return conveyor
     }
     //Event click button Shelfinfo
     let buttonConveyor = advancedTexture.getControlByName("ButtonConveyor");
     buttonConveyor.onPointerClickObservable.add(async () => {
-        let conve = await createConveyor();
+        let positionConveyor = new Vector3()
+        // Adjust the position of the box
+        if (position !== 1) {
+            positionConveyor.x += position;
+        } else {
+            positionConveyor.x += 4;
+        }
+
+        position = positionConveyor.x + 4;
+        let conve = await createConveyor(positionConveyor);
+        handler.postConveyor(conve.position.x, conve.position.y, conve.position.z)
     });
 
     var getGroundPosition = function () {
