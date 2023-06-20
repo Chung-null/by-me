@@ -61,7 +61,7 @@ export async function makeBox(): Promise<Mesh> {
     // Function to create a box and return it as a Promise
     async function createBox(position: Vector3) {
         // Import the box
-        const result = await SceneLoader.ImportMeshAsync(null, "box/", "boxeton.obj", scene);
+        const result = await SceneLoader.ImportMeshAsync(null, "box/", "boxeton1.obj", scene);
         const box = result.meshes[0];
         const randomNumber = generateUniqueRandom(Number.MAX_SAFE_INTEGER)
         console.log(box.name , "heheh")
@@ -105,7 +105,7 @@ export async function makeBox(): Promise<Mesh> {
     var pointerDown = function (box: AbstractMesh) {
         try {
             if (box) {
-                if (box.name.includes("Cube.022")) {
+                if (box.name.toLowerCase().includes("box")) {
                     if (currentBox) {
 
                         // currentBox.material.wireframe = false;
@@ -133,6 +133,9 @@ export async function makeBox(): Promise<Mesh> {
                         }, 0);
 
                     }
+                }
+                else {
+                    
                 }
             }
         }
