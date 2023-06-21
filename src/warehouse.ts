@@ -3,6 +3,7 @@ import { scene, engine, camera, canvas } from './scene'
 import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
+import { handlers } from './api/handlers';
 
 export async function makeWare(): Promise<Mesh> {
     var startingWare;
@@ -26,30 +27,50 @@ export async function makeWare(): Promise<Mesh> {
     let btndelete = advancedTexture.getControlByName("BtnDelete")
     let listexportbox = advancedTexture.getControlByName("ListExportBox");
     listexportbox.isVisible = false;
-
-    async function createWarehouse() {
+    // handle API
+    let handler = new handlers()
+    async function syncWarehouseFromDB() {
+        let allWarehouseOnDB = await handler.get("warehouse")
+        if (allWarehouseOnDB.status == 200) {
+            allWarehouseOnDB.content.forEach(async function(element){
+                if (wares.filter(ware => ware.id == element.nid).length == 0) {// unique on array
+                    let wareSync = await createWarehouse(new Vector3(element.x, element.y, element.z))
+                    wareSync.id = element.nid
+                    wares.push(wareSync)
+                }
+            });
+        }
+    }
+    async function createWarehouse(positionWarehouse: Vector3) {
         // Import the pallet
         const result = await SceneLoader.ImportMeshAsync(null, "warehouse/", "eton.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
         ware = result.meshes[0];
-        if (position != 1) {
-            ware.position.x += position;
-        }
-        else {
-            ware.position.x += 4;
-        }
-
-        position = ware.position.x + 4;
+        ware.position = positionWarehouse
 
 
-        wares.push(ware);
+        return ware
     }
 
     //Add Warehouse
     let buttonWarehouse = advancedTexture.getControlByName("ButtonWarehouse");
     buttonWarehouse.onPointerClickObservable.add(async() => {
-        const ware = await createWarehouse();
+        let positionWarehouse = new Vector3()
+        if (position != 1) {
+            positionWarehouse.x += position;
+        }
+        else {
+            positionWarehouse.x += 4;
+        }
+
+        position = positionWarehouse.x + 4;
+        let resultPost = await handler.postConveyor(positionWarehouse.x, positionWarehouse.y, positionWarehouse.z)
+        if (resultPost.status == 201) {
+            let ware = await createWarehouse(positionWarehouse);
+            ware.id = resultPost.content[0].nid
+            wares.push(ware)
+        }
     });
 
     var getGroundPosition = function () {
@@ -131,6 +152,7 @@ export async function makeWare(): Promise<Mesh> {
             currentWare = null;
         }
     });
-
+    // setInterval(syncWarehouseFromDB, 2000)
+    await syncWarehouseFromDB()
     return ware
 }
