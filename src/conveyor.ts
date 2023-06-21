@@ -12,7 +12,7 @@ export async function makeConveyor(): Promise<Mesh> {
     var outlineconveyor;
     var position = 1;
     var conveyor;
-    var palletes = [];
+    var conveyors = [];
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
     let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#95");
@@ -30,15 +30,24 @@ export async function makeConveyor(): Promise<Mesh> {
     listexportbox.isVisible = false;
     // handle API
     let handler = new handlers()
-
+    async function syncConveyorFromDB() {
+        let allConveyorOnDB = await handler.get("conveyor")
+        if (allConveyorOnDB.status == 200) {
+            allConveyorOnDB.content.forEach(async function(element){
+                if (conveyors.filter(conveyor => conveyor.id == element.nid).length == 0) {// unique on array
+                    let conveyorSync = await createConveyor(new Vector3(element.x, element.y, element.z))
+                    conveyorSync.id = element.nid
+                    conveyors.push(conveyorSync)
+                }
+            });
+        }
+    }
     async function createConveyor(position: Vector3) {
         const conveyorhouse = await SceneLoader.ImportMeshAsync(null, "conveyor/", "conveyor.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
         const conveyor = conveyorhouse.meshes[0];
         conveyor.position = position
-
-        palletes.push(conveyor);
         return conveyor
     }
     //Event click button Shelfinfo
@@ -53,8 +62,12 @@ export async function makeConveyor(): Promise<Mesh> {
         }
 
         position = positionConveyor.x + 4;
-        let conve = await createConveyor(positionConveyor);
-        handler.postConveyor(conve.position.x, conve.position.y, conve.position.z)
+        let resultPost = await handler.postConveyor(positionConveyor.x, positionConveyor.y, positionConveyor.z)
+        if (resultPost.status == 201) {
+            let conve = await createConveyor(positionConveyor);
+            conve.id = resultPost.content[0].nid
+            conveyors.push(conve)
+        }
     });
 
     var getGroundPosition = function () {
@@ -133,6 +146,7 @@ export async function makeConveyor(): Promise<Mesh> {
             currentConveyor = null;
         }
     });
-
+    // setInterval(syncConveyorFromDB, 2000)
+    await syncConveyorFromDB()
     return conveyor
 }

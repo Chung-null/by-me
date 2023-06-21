@@ -15,7 +15,7 @@ export class handlers {
     readonly defaultType = '?_format=json'
     constructor() { }
     // sử dụng get / lấy dữ liệu
-    async get(table: String) {
+    async get(table: string) {
         let url = this.defaultUrl + "/" + table + this.defaultType
         return await this.getWithURL(new URL(url))
     }
@@ -28,7 +28,7 @@ export class handlers {
             data_content.import_date = new Date(importParsed * 1000)
 
             // export
-            if (data_content.export_date != "false") {
+            if (data_content.export_date) {
                 let exportParsed = Number(data_content.export_date)
                 data_content.export_date = new Date(exportParsed * 1000)
             }
@@ -38,7 +38,7 @@ export class handlers {
         }
         return data
     }
-    async getBoxWithName(name: String) {
+    async getBoxWithName(name: string) {
         let url = this.defaultUrl + "/"  + "box" + "/" + name + this.defaultType
         let data = await this.getWithURL(new URL(url))
         for (let data_content of data.content) {
@@ -57,19 +57,25 @@ export class handlers {
         }
         return data
     }
-    async getWithID(id: Number) {
+    async getWithID(id: number) {
         let url = this.defaultUrl + "/"  + id + this.defaultType
         return await this.getWithURL(new URL(url))
     }
-    async getWithName(table: String, name: String) {
+    async getWithName(table: string, name: string) {
         let url = this.defaultUrl + "/"  + table + "/" + name + this.defaultType
         return await this.getWithURL(new URL(url))
     }
 
     // sử dụng post/ tải lên dữ liệu
     // shelf
-    async postShelf(name: String, weight: Number, colums: Number, rows: Number, depth: Number, x: Number, y: Number, z: Number) {
-        let shelfPost = new shelf(name, weight, x, y, z)
+    async postShelf(name: string, weight: number, columns: number, rows: number, depth: number, x: number, y: number, z: number) {
+        if (rows < 1 || columns < 1 || depth < 1 || weight < 1) {
+            return { status: 404, message: "Các chỉ số của kệ hàng không được bỏ trống và không thể nhỏ hơn 1!", content: [] } 
+        }
+        if (name.trim() == "") {
+            return { status: 404, message: "Tên không được bỏ trống!", content: [] } 
+        }
+        let shelfPost = new shelf(name, weight, columns, rows, depth, x, y, z)
         let dataPost = shelfPost.getShelf()
         if (await this.checkConstraintShelf(name)) {
             return await this.post(dataPost)
@@ -79,7 +85,7 @@ export class handlers {
         }
     }
     // box
-    async postBox(name: String, x: Number, y: Number, z: Number) {
+    async postBox(name: string, x: number, y: number, z: number) {
         let boxPost = new box(name, x, y, z)
         let dataPost = boxPost.getBox()
         if (await this.checkConstraintBox(name)) {
@@ -90,26 +96,26 @@ export class handlers {
         }
     }
     // warehouse
-    async postWarehouse(x: Number, y: Number, z: Number) {
+    async postWarehouse(x: number, y: number, z: number) {
         let warehousePost = new warehouse(x, y, z)
         let dataPost = warehousePost.getWarehouse()
         return await this.post(dataPost)
     }
     // pallet
-    async postPallet(x: Number, y: Number, z: Number) {
+    async postPallet(x: number, y: number, z: number) {
         let palletPost = new pallet(x, y, z)
         let dataPost = palletPost.getPallet()
         return await this.post(dataPost)
     }
     // conveyor
-    async postConveyor(x: Number, y: Number, z: Number) {
+    async postConveyor(x: number, y: number, z: number) {
         let conveyorPost = new conveyor(x, y, z)
         let dataPost = conveyorPost.getConveyor()
         return await this.post(dataPost)
     }
     // Sử dụng put/ cập nhật dữ liệu
     //shelf
-    async putNameShelf(id: Number, newName: String) {
+    async putNameShelf(id: number, newName: string) {
         let putShelf = new shelf(newName)
         let dataPost = putShelf.getPutNameShelf()
         if (this.checkConstraintShelf(newName)) {
@@ -119,13 +125,13 @@ export class handlers {
             return { status: 404, message: "Tên không được trùng lặp!", content: [] }
         }
     }
-    async putWeightShelf(id: Number, weight: Number) {
+    async putWeightShelf(id: number, weight: number) {
         let putShelf = new shelf()
         putShelf.setWeight = weight
         let dataPost = putShelf.getPutWeightShelf()
         return await this.put(id, dataPost)
     }
-    async putPositionShelf(id: Number, x: Number, y: Number, z: Number) {
+    async putPositionShelf(id: number, x: number, y: number, z: number) {
         let putShelf = new shelf()
         putShelf.setPosition(x, y, z)
         let dataPost = putShelf.getPutPositionShelf()
@@ -133,7 +139,7 @@ export class handlers {
     }
 
     //box
-    async putNameBox(id: Number, newName: String) {
+    async putNameBox(id: number, newName: string) {
         let putBox = new box(newName)
         let dataPost = putBox.getPutNameBox()
         if (this.checkConstraintBox(newName)) {
@@ -143,13 +149,13 @@ export class handlers {
             return { status: 404, message: "Tên không được trùng lặp!", content: [] }
         }
     }
-    async putExportBox(id: Number, export_date: String) {
+    async putExportBox(id: number, export_date: string) {
         let putBox = new box()
         putBox.setExportDate = getCurrentDate()
         let dataPost = putBox.getPutExportDateBox()
         return await this.put(id, dataPost)
     }
-    async putPositionBox(id: Number, x: Number, y: Number, z: Number) {
+    async putPositionBox(id: number, x: number, y: number, z: number) {
         let putBox = new box()
         putBox.setPosition(x, y, z)
         let dataPost = putBox.getPutPositionBox()
@@ -157,38 +163,38 @@ export class handlers {
     }
 
     //warehouse
-    async putPositionWarehouse(id: Number, x: Number, y: Number, z: Number) {
+    async putPositionWarehouse(id: number, x: number, y: number, z: number) {
         let putWarehouse = new warehouse(x, y, z)
         let dataPost = putWarehouse.getPutPositionWarehouse()
         return await this.put(id, dataPost)
     }
     //pallet
-    async putPositionPallet(id: Number, x: Number, y: Number, z: Number) {
+    async putPositionPallet(id: number, x: number, y: number, z: number) {
         let putPallet= new pallet(x, y, z)
         let dataPost = putPallet.getPutPositionPallet()
         return await this.put(id, dataPost)
     }
     //warehouse
-    async putPositionConveyor(id: Number, x: Number, y: Number, z: Number) {
+    async putPositionConveyor(id: number, x: number, y: number, z: number) {
         let putConveyor = new conveyor(x, y, z)
         let dataPost = putConveyor.getPutPositionConveyor()
         return await this.put(id, dataPost)
     }
 
     //sử dụng delete/ xóa ứng dụng
-    async deleteShelf(id: Number) {
+    async deleteShelf(id: number) {
         return await this.delete(id)
     }
-    async deleteBox(id: Number) {
+    async deleteBox(id: number) {
         return await this.delete(id)
     }
-    async deleteWarehouse(id: Number) {
+    async deleteWarehouse(id: number) {
         return await this.delete(id)
     }
-    async deletePallet(id: Number) {
+    async deletePallet(id: number) {
         return await this.delete(id)
     }
-    async deleteConveyor(id: Number) {
+    async deleteConveyor(id: number) {
         return await this.delete(id)
     }
     //get post nền tảng
@@ -241,7 +247,7 @@ export class handlers {
         })
     }
     //put
-    private async put(id: Number, dataPost: {}) {
+    private async put(id: number, dataPost: {}) {
         return await fetch(this.defaultUrl + "/"  + id + this.defaultType, {
           method: 'PATCH', 
           headers: {'content-type':'application/json'},
@@ -263,7 +269,7 @@ export class handlers {
         })
     }
     // delete
-    private async delete(id: Number) {
+    private async delete(id: number) {
         return await fetch(this.defaultUrl + "/" +id+this.defaultType, {
             method: 'DELETE'
           }).then(async function (res) {
@@ -283,13 +289,13 @@ export class handlers {
           })
     }
     // ràng buộc
-    private async checkConstraintBox(name: String) {
+    private async checkConstraintBox(name: string) {
         return await this.checkConstraintName(TABLE.BOX, name)
     }
-    private async checkConstraintShelf(name: String) {
+    private async checkConstraintShelf(name: string) {
         return await this.checkConstraintName(TABLE.SHELF, name)
     }
-    private async checkConstraintName(table: String, name: String) {
+    private async checkConstraintName(table: string, name: string) {
         let dataNameExist = await this.getWithName(table, name)
         if (dataNameExist.content.length > 0) {
             return false

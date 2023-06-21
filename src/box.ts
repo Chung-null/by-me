@@ -61,18 +61,26 @@ export async function makeBox(): Promise<Mesh> {
     //  handle API
     let handler = new handlers()
     // Function to create a box and return it as a Promise
-    async function createBox(position: Vector3) {
+    async function createBox(name: string, position: Vector3) {
         // Import the box
         const result = await SceneLoader.ImportMeshAsync(null, "box/", "boxeton1.obj", scene);
         const box = result.meshes[0];
-        const randomNumber = generateUniqueRandom(Number.MAX_SAFE_INTEGER)
-        console.log(box.name , "heheh")
+        box.name = name
         box.position = position
-
-        boxes.push(box);
         return box
     }
-
+    async function syncBoxFromDB() {
+        let allBoxOnDB = await handler.getBoxDefault()
+        if (allBoxOnDB.status == 200) {
+            allBoxOnDB.content.forEach(async function(element){
+                if (boxes.filter(box => box.id == element.nid).length == 0) {// unique on array
+                    let boxSync = await createBox(element.name, new Vector3(element.x, element.y, element.z))
+                    boxSync.id = element.nid
+                    boxes.push(boxSync)
+                }
+            });
+        }
+    }
     // Event handler for the "Add Box" button
     btnsaveinfobox.onPointerClickObservable.add(async () => {
         const nameBox = txtBoxNameInfo.text
@@ -85,8 +93,13 @@ export async function makeBox(): Promise<Mesh> {
         }
 
         position = positionBox.x + 4;
-        const box = await createBox(positionBox);
-        handler.postBox(nameBox, box.position.x, box.position.y, box.position.z)
+        let resultPost = await handler.postBox(nameBox, positionBox.x, positionBox.y, positionBox.z)
+        if (resultPost.status == 201) {
+            const box = await createBox(nameBox, positionBox);
+            box.id = resultPost.content[0].nid
+            boxes.push(box)
+        }
+
         // You can perform additional actions with the created box if needed
     });
 
@@ -222,6 +235,8 @@ export async function makeBox(): Promise<Mesh> {
                 break;
         }
     });
+    // setInterval(syncBoxFromDB, 2000)
+    await syncBoxFromDB()
     // delete selected boxes
     btndelete.onPointerClickObservable.add(() => {
         if (currentBox != null) {

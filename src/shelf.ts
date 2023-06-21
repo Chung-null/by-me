@@ -105,32 +105,39 @@ export async function makeShelf(): Promise<Mesh> {
         mesh.position.y = offsetY;
         mesh.position.z = offsetZ;
         mesh.material = shelfMaterial;
-        shelf.push(mesh);
         // handler.postShelf(name)
 
         return mesh
     }
-    buttonShelfware.onPointerClickObservable.add(() => {
-        listMenuShelf.isVisible = true;
-    });
-
-    colorpickershelf.value = shelfMaterial.diffuseColor;
-    buttonShelfware.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-    colorpickershelf.onValueChangedObservable.add(function (value) {
-        shelfMaterial.diffuseColor.copyFrom(value);
-    });
-    btnsaveshelf.onPointerClickObservable.add(async () => {
+    async function createCompleteShelf() {
         // Retrieve the number of shelves from input text controls
         let addRow = parseInt(txtaddRow.text);
         let addColumn = parseInt(txtaddColumn.text);
         let addDepth = parseInt(txtaddDepth.text);
         let addWeightShelf = parseInt(txtWeightInfo.text);
         let addNameShelf = txtNameInfo.text
+        if (addRow < 1 || addColumn < 1 || addDepth < 1 || addWeightShelf < 1) {
+            alert("Các chỉ số của kệ hàng không được bỏ trống và không thể nhỏ hơn 1!")
+            return 
+        }
+        if (addNameShelf.trim() == "") {
+            alert("Tên kệ hàng không được bỏ trống!")
+            return 
+        }
+        let resultPost = await handler.postShelf(addNameShelf, addWeightShelf, addColumn, addRow, addDepth, offsetX, offsetY, offsetZ)
+        if (resultPost.status == 201) {
+            let shelfImported = await importShelf(resultPost.content[0].nid, addNameShelf, addRow, addColumn, addDepth, offsetX, offsetY, offsetZ)
+            shelf.push(shelfImported)
+        }
+    }
+    async function importShelf(id, name, rows, columns, depth, offsetX, offsetY, offsetZ) {
+        let meshesInShelf = []
         // Import the mesh
-        for (let i = 0; i < addRow; i++) {
-            for (let j = 0; j < addColumn; j++) {
-                for (let k = 0; k < addDepth; k++) {
-                    await createShelf(offsetX, offsetY, offsetZ);
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < columns; j++) {
+                for (let k = 0; k < depth; k++) {
+                    let meshShelfCreated = await createShelf(offsetX, offsetY, offsetZ);
+                    meshesInShelf.push(meshShelfCreated)
                     offsetZ += 2;
                 }
                 offsetZ = 0;
@@ -145,19 +152,43 @@ export async function makeShelf(): Promise<Mesh> {
         txtaddColumn.text = "";
         txtaddRow.text = "";
         txtaddDepth.text = "";
-        if (shelf != null) {
+        if (meshesInShelf.length > 0) {
 
-            var groupMesh = Mesh.MergeMeshes(shelf);
+            var groupMesh = Mesh.MergeMeshes(meshesInShelf);
+            groupMesh.name = name
+            groupMesh.id = id 
+            return groupMesh
+        }
+        return new Mesh("")
+    }
+    async function syncShelfFromDB() {
+        let allShelfOnDB = await handler.get("shelf")
+        if (allShelfOnDB.status == 200) {
+            allShelfOnDB.content.forEach(async function(element){
+                if (shelf.filter(_shelf => _shelf.id == element.nid).length == 0) {// unique on array
+                    let shelfSync = await importShelf(element.nid, element.name, element.field_rows, element.field_columns, element.field_depth, element.x, element.y, element.z)
+                    if (shelfSync.name != "") {
+                        shelf.push(shelfSync)
+                    }
+                }
+            });
+        }
+    }
+    buttonShelfware.onPointerClickObservable.add(() => {
+        listMenuShelf.isVisible = true;
+    });
 
-            // remove the same element
-            shelf = shelf.filter(n => !shelf.includes(n));
-
-            shelf.push(groupMesh);
-            console.log("grouping");
-            let resultPost = await handler.postShelf(addNameShelf, addWeightShelf, addColumn, addRow, addDepth, groupMesh.position.x, groupMesh.position.y, groupMesh.position.z)
-            if (resultPost.status == 200) {
-
-            }
+    colorpickershelf.value = shelfMaterial.diffuseColor;
+    buttonShelfware.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+    colorpickershelf.onValueChangedObservable.add(function (value) {
+        shelfMaterial.diffuseColor.copyFrom(value);
+    });
+    btnsaveshelf.onPointerClickObservable.add(() => {
+        try {
+            createCompleteShelf()
+        }
+        catch(e) {
+            alert("Có lỗi xảy ra! Có thể nguyên nhân là do bạn để trống thuộc tính nào đó")
         }
     })
     btncloseshelf.onPointerUpObservable.add(() => {
@@ -298,6 +329,9 @@ export async function makeShelf(): Promise<Mesh> {
                 break;
         }
     });
+    //sync db
+    // setInterval(syncShelfFromDB, 2000)
+    syncShelfFromDB()
     // delete selected meshes
     btndelete.onPointerClickObservable.add(() => {
         if (currentMesh != null) {

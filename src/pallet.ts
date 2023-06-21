@@ -32,16 +32,25 @@ export async function makePallet(): Promise<Mesh> {
     // handle API
     let handler = new handlers()
 
+    async function syncPalletFromDB() {
+        let allPalletOnDB = await handler.get("pallet")
+        if (allPalletOnDB.status == 200) {
+            allPalletOnDB.content.forEach(async function(element){
+                if (palletes.filter(pallet => pallet.id == element.nid).length == 0) {// unique on array
+                    let palletSync = await createPallet(new Vector3(element.x, element.y, element.z))
+                    palletSync.id = element.nid
+                    palletes.push(palletSync)
+                }
+            });
+        }
+    }
     async function createPallet(position: Vector3) {
         // Import the pallet
         const result = await SceneLoader.ImportMeshAsync(null, "pallet/", "palleteton.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
-        pallet = result.meshes[0];
-        pallet.name = "pallet hehe"
+        pallet = result.meshes[0]
         pallet.position = position
-
-        palletes.push(pallet);
         return pallet
     }
 
@@ -57,8 +66,12 @@ export async function makePallet(): Promise<Mesh> {
         }
 
         position = positionPallet.x + 4;
-        let palet = await createPallet(positionPallet);
-        handler.postPallet(palet.position.x,pallet.position.y, pallet.position.z)
+        let resultPost = await handler.postPallet(positionPallet.x,positionPallet.y, positionPallet.z)
+        if (resultPost.status == 201) {
+            let pallet = await createPallet(positionPallet);
+            pallet.id = resultPost.content[0].nid
+            palletes.push(pallet)
+        }
     });
 
     var getGroundPosition = function () {
@@ -147,6 +160,9 @@ export async function makePallet(): Promise<Mesh> {
             currentPallet = null;
         }
     });
+
+    // setInterval(syncPalletFromDB, 2000)
+    await syncPalletFromDB()
 
     return pallet
 }
