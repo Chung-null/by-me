@@ -19,7 +19,7 @@ export async function makeBox(): Promise<Mesh> {
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
 
 
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#100"); //L91IFF#73, L91IFF#76, L91IFF#75
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#101"); //L91IFF#73, L91IFF#76, L91IFF#75
 
 
 
@@ -39,10 +39,15 @@ export async function makeBox(): Promise<Mesh> {
 
 
     let buttonListBox = advancedTexture.getControlByName("ButtonBox");
+    //Button Edit Box
+    let btneditnamebox = advancedTexture.getControlByName("ButtonEditBox");
+    let btnexportbox = advancedTexture.getControlByName("ButtonExportBox");
     //Get Location Object
     let txtXposition = <InputText>advancedTexture.getControlByName("InputTextX");
     let txtYposition = <InputText>advancedTexture.getControlByName("InputTextY");
     let txtZposition = <InputText>advancedTexture.getControlByName("InputTextZ");
+    // Edit Box Name
+    let txteditnamebox = <InputText>advancedTexture.getControlByName("InputNameExportBox");
 
     //Event click button Shelfinfo
     buttonListBox.onPointerClickObservable.add(() => {

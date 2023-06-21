@@ -52,7 +52,7 @@ export async function makeShelf(): Promise<Mesh> {
     }
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#100");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#101");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -75,6 +75,7 @@ export async function makeShelf(): Promise<Mesh> {
     let btnsaveshelf = advancedTexture.getControlByName("BtnSaveShelf");
     let btndelete = advancedTexture.getControlByName("BtnDelete");
     let btncloseshelf = advancedTexture.getControlByName("BtnCloseShelf");
+    let btneditshelf = advancedTexture.getControlByName("BtnEditShelf");
 
     //Get Location Object
     let txtXposition = <InputText>advancedTexture.getControlByName("InputTextX");
@@ -86,6 +87,9 @@ export async function makeShelf(): Promise<Mesh> {
     let txtaddColumn = <InputText>advancedTexture.getControlByName("InputTextColumn");
     let txtaddRow = <InputText>advancedTexture.getControlByName("InputTextRow");
     let txtaddDepth = <InputText>advancedTexture.getControlByName("InputTextDepth");
+    //Edit Shelf
+    let txteditnameshelf = <InputText>advancedTexture.getControlByName("InputEditNameShelf");
+    let txteditweightshelf = <InputText>advancedTexture.getControlByName("InputEditWeightShelf");
     // handle db 
     let handler = new handlers()
     var shelfMaterial = new StandardMaterial("shelfmat", scene);
