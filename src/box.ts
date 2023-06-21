@@ -69,15 +69,18 @@ export async function makeBox(): Promise<Mesh> {
     async function createBox(name: string, position: Vector3) {
         // Import the box
         const result = await SceneLoader.ImportMeshAsync(null, "box/", "boxeton1.obj", scene);
-        const box = result.meshes[0];
-        box.name = name
+        // result.meshes[1].name = name
+        // result.meshes[1].position = position
+        box = result.meshes[1]
+        box.name = "box" + name
         box.position = position
-        return box
+        console.log(result.meshes.length)
+        return result.meshes[0]
     }
     async function syncBoxFromDB() {
         let allBoxOnDB = await handler.getBoxDefault()
         if (allBoxOnDB.status == 200) {
-            allBoxOnDB.content.forEach(async function(element){
+            allBoxOnDB.content.forEach(async function (element) {
                 if (boxes.filter(box => box.id == element.nid).length == 0) {// unique on array
                     let boxSync = await createBox(element.name, new Vector3(element.x, element.y, element.z))
                     boxSync.id = element.nid
@@ -137,6 +140,7 @@ export async function makeBox(): Promise<Mesh> {
                         txtYposition.text = "";
                         txtZposition.text = "";
                         listexportbox.isVisible = false
+                        txteditnamebox.text = "";
                     }
 
                     currentBox = box;
@@ -155,11 +159,11 @@ export async function makeBox(): Promise<Mesh> {
                     }
                 }
                 else {
-                    
+
                 }
             }
         }
-        catch(e) {
+        catch (e) {
             console.log(e)
         }
     }
@@ -171,15 +175,16 @@ export async function makeBox(): Promise<Mesh> {
                 startingBox = null;
 
                 location.isVisible = true;
-                txtXposition.text = currentBox.position.x.toFixed(2);
-                txtYposition.text = currentBox.position.y.toFixed(2);
-                txtZposition.text = currentBox.position.z.toFixed(2);
+                txtXposition.text = Number(currentBox.position.x).toFixed(2)
+                txtYposition.text = Number(currentBox.position.y).toFixed(2);
+                txtZposition.text = Number(currentBox.position.z).toFixed(2);
 
-                listexportbox.isVisible = true
+                listexportbox.isVisible = true;
+                txteditnamebox.text = currentBox.name.toString();
                 return;
             }
         }
-        catch(e) {
+        catch (e) {
             console.log(e)
         }
     }
@@ -218,6 +223,7 @@ export async function makeBox(): Promise<Mesh> {
                         txtYposition.text = "";
                         txtZposition.text = "";
                         listexportbox.isVisible = false;
+                        txteditnamebox.text = "";
                     }
                 }
                 else if (pointerInfo.pickInfo.pickedMesh == ground && pointerInfo.event.button == 0) {

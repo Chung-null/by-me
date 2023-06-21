@@ -95,23 +95,19 @@ export async function makeShelf(): Promise<Mesh> {
     var shelfMaterial = new StandardMaterial("shelfmat", scene);
     // Function to create a single shelf
     async function createShelf(offsetX, offsetY, offsetZ) {
-        const result = await SceneLoader.ImportMeshAsync(
-            null,
-            "shelf/",
-            "shelfeton1.obj",
-            scene,
-            function (container) { }
-        );
+        const result = await SceneLoader.ImportMeshAsync(null, "shelf/","shelfeton1.obj",scene);
         const randomNumber = generateUniqueRandom(Number.MAX_SAFE_INTEGER)
 
-        let mesh = result.meshes[0];
+        
+        mesh = result.meshes[0]
+        console.log(result.meshes.length)
         mesh.position.x = offsetX;
         mesh.position.y = offsetY;
         mesh.position.z = offsetZ;
         mesh.material = shelfMaterial;
         // handler.postShelf(name)
 
-        return mesh
+        return result.meshes[0];
     }
     async function createCompleteShelf() {
         // Retrieve the number of shelves from input text controls
@@ -159,7 +155,7 @@ export async function makeShelf(): Promise<Mesh> {
         if (meshesInShelf.length > 0) {
 
             var groupMesh = Mesh.MergeMeshes(meshesInShelf);
-            groupMesh.name = name
+            groupMesh.name = "shelf" + name
             groupMesh.id = id 
             return groupMesh
         }
@@ -221,6 +217,7 @@ export async function makeShelf(): Promise<Mesh> {
                         txtZposition.text = "";
 
                         listeditshelf.isVisible = false;
+                        txteditnameshelf.text = "";
 
                     }
 
@@ -260,13 +257,15 @@ export async function makeShelf(): Promise<Mesh> {
                 camera.attachControl(canvas, true)
 
                 location.isVisible = true;
-                txtXposition.text = currentMesh.position.x.toFixed(2);
-                txtYposition.text = currentMesh.position.y.toFixed(2);
-                txtZposition.text = currentMesh.position.z.toFixed(2);
+                txtXposition.text = Number(currentMesh.position.x).toFixed(2)
+                txtYposition.text = Number(currentMesh.position.y).toFixed(2);
+                txtZposition.text = Number(currentMesh.position.z).toFixed(2);
 
                 listeditshelf.isVisible = true;
+                txteditnameshelf.text = currentMesh.name.toString()
+                
 
-                camera.attachControl(canvas, true);
+                //camera.attachControl(canvas, true);
                 startingPoint = null;
 
                 return;
@@ -309,7 +308,7 @@ export async function makeShelf(): Promise<Mesh> {
                         txtYposition.text = "";
                         txtZposition.text = "";
                         listeditshelf.isVisible = false;
-
+                        txteditnameshelf.text = "";
                     }
                     // console.log("down");
                 }
