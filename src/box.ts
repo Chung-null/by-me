@@ -19,7 +19,7 @@ export async function makeBox(): Promise<Mesh> {
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
 
 
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#118"); //L91IFF#73, L91IFF#76, L91IFF#75
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#119"); //L91IFF#73, L91IFF#76, L91IFF#75
 
 
 
@@ -81,9 +81,9 @@ export async function makeBox(): Promise<Mesh> {
         let allBoxOnDB = await handler.getBoxDefault()
         if (allBoxOnDB.status == 200) {
             allBoxOnDB.content.forEach(async function (element) {
-                if (boxes.filter(box => box.id == element.nid).length == 0) {// unique on array
+                if (boxes.filter(box => box.id == element.id).length == 0) {// unique on array
                     let boxSync = await createBox(element.name, new Vector3(element.x, element.y, element.z))
-                    boxSync.id = element.nid
+                    boxSync.id = element.id
                     boxes.push(boxSync)
                 }
             });
@@ -104,7 +104,7 @@ export async function makeBox(): Promise<Mesh> {
         let resultPost = await handler.postBox(nameBox, positionBox.x, positionBox.y, positionBox.z)
         if (resultPost.status == 201) {
             const box = await createBox(nameBox, positionBox);
-            box.id = resultPost.content[0].nid
+            box.id = resultPost.content.nid
             boxes.push(box)
         }
 

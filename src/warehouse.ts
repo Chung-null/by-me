@@ -35,9 +35,9 @@ export async function makeWare(): Promise<Mesh> {
         let allWarehouseOnDB = await handler.get("warehouse")
         if (allWarehouseOnDB.status == 200) {
             allWarehouseOnDB.content.forEach(async function(element){
-                if (wares.filter(ware => ware.id == element.nid).length == 0) {// unique on array
+                if (wares.filter(ware => ware.id == element.id).length == 0) {// unique on array
                     let wareSync = await createWarehouse(new Vector3(element.x, element.y, element.z))
-                    wareSync.id = element.nid
+                    wareSync.id = element.id
                     wares.push(wareSync)
                 }
             });
