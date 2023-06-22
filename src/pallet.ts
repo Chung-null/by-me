@@ -40,9 +40,9 @@ export async function makePallet(): Promise<Mesh> {
         let allPalletOnDB = await handler.get("pallet")
         if (allPalletOnDB.status == 200) {
             allPalletOnDB.content.forEach(async function (element) {
-                if (palletes.filter(pallet => pallet.id == element.nid).length == 0) {// unique on array
+                if (palletes.filter(pallet => pallet.id == element.id).length == 0) {// unique on array
                     let palletSync = await createPallet(new Vector3(element.x, element.y, element.z))
-                    palletSync.id = element.nid
+                    palletSync.id = element.id
                     palletes.push(palletSync)
                 }
             });
@@ -73,7 +73,7 @@ export async function makePallet(): Promise<Mesh> {
         let resultPost = await handler.postPallet(positionPallet.x, positionPallet.y, positionPallet.z)
         if (resultPost.status == 201) {
             let pallet = await createPallet(positionPallet);
-            pallet.id = resultPost.content[0].nid
+            pallet.id = resultPost.content.nid
             palletes.push(pallet)
         }
     });

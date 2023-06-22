@@ -36,9 +36,9 @@ export async function makeConveyor(): Promise<Mesh> {
         let allConveyorOnDB = await handler.get("conveyor")
         if (allConveyorOnDB.status == 200) {
             allConveyorOnDB.content.forEach(async function (element) {
-                if (conveyors.filter(conveyor => conveyor.id == element.nid).length == 0) {// unique on array
+                if (conveyors.filter(conveyor => conveyor.id == element.id).length == 0) {// unique on array
                     let conveyorSync = await createConveyor(new Vector3(element.x, element.y, element.z))
-                    conveyorSync.id = element.nid
+                    conveyorSync.id = element.id
                     conveyors.push(conveyorSync)
                 }
             });
@@ -67,7 +67,7 @@ export async function makeConveyor(): Promise<Mesh> {
         let resultPost = await handler.postConveyor(positionConveyor.x, positionConveyor.y, positionConveyor.z)
         if (resultPost.status == 201) {
             let conve = await createConveyor(positionConveyor);
-            conve.id = resultPost.content[0].nid
+            conve.id = resultPost.content.nid
             conveyors.push(conve)
         }
     });
