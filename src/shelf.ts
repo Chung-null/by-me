@@ -52,7 +52,7 @@ export async function makeShelf(): Promise<Mesh> {
     }
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#101");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#118");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -218,6 +218,7 @@ export async function makeShelf(): Promise<Mesh> {
 
                         listeditshelf.isVisible = false;
                         txteditnameshelf.text = "";
+                    
 
                     }
 

@@ -15,7 +15,7 @@ export async function makeConveyor(): Promise<Mesh> {
     var conveyors = [];
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#101");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#118");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -35,7 +35,7 @@ export async function makeConveyor(): Promise<Mesh> {
     async function syncConveyorFromDB() {
         let allConveyorOnDB = await handler.get("conveyor")
         if (allConveyorOnDB.status == 200) {
-            allConveyorOnDB.content.forEach(async function(element){
+            allConveyorOnDB.content.forEach(async function (element) {
                 if (conveyors.filter(conveyor => conveyor.id == element.nid).length == 0) {// unique on array
                     let conveyorSync = await createConveyor(new Vector3(element.x, element.y, element.z))
                     conveyorSync.id = element.nid
@@ -72,7 +72,7 @@ export async function makeConveyor(): Promise<Mesh> {
         }
     });
 
-    var getGroundPosition = function () {
+    var getGroundPositionConvey = function () {
         var pickinfoconveyor = scene.pick(scene.pointerX, scene.pointerY, function (conveyor) { return conveyor == ground; });
         if (pickinfoconveyor.hit) {
             return pickinfoconveyor.pickedPoint;
@@ -94,10 +94,10 @@ export async function makeConveyor(): Promise<Mesh> {
         outlineconveyor.outlineColor = Color3.Green();
         outlineconveyor.renderOutline = true;
 
-        startingConveyor = getGroundPosition();
+        startingConveyor = getGroundPositionConvey();
         if (startingConveyor) { // we need to disconnect camera from canvas
             setTimeout(function () {
-                // camera.detachControl(canvas);
+                camera.detachControl(canvas);
             }, 0);
 
         }
@@ -105,6 +105,8 @@ export async function makeConveyor(): Promise<Mesh> {
     }
     var pointerUp = function () {
         if (startingConveyor) {
+            outlineconveyor = currentConveyor;
+            outlineconveyor.renderOutline = false;
             camera.attachControl(canvas, true);
             startingConveyor = null;
             return;
@@ -114,7 +116,7 @@ export async function makeConveyor(): Promise<Mesh> {
         if (!startingConveyor) {
             return;
         }
-        var current = getGroundPosition();
+        var current = getGroundPositionConvey();
         if (!current) {
             return;
         }

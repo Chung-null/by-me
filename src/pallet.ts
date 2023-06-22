@@ -14,9 +14,11 @@ export async function makePallet(): Promise<Mesh> {
     var position = 1;
     var pallet;
     var palletes = [];
+    var gizmoManager = new GizmoManager(scene)
+
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#101");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#118");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -37,7 +39,7 @@ export async function makePallet(): Promise<Mesh> {
     async function syncPalletFromDB() {
         let allPalletOnDB = await handler.get("pallet")
         if (allPalletOnDB.status == 200) {
-            allPalletOnDB.content.forEach(async function(element){
+            allPalletOnDB.content.forEach(async function (element) {
                 if (palletes.filter(pallet => pallet.id == element.nid).length == 0) {// unique on array
                     let palletSync = await createPallet(new Vector3(element.x, element.y, element.z))
                     palletSync.id = element.nid
@@ -58,7 +60,7 @@ export async function makePallet(): Promise<Mesh> {
 
     //Event click button Shelfinfo
     let buttonPallet = advancedTexture.getControlByName("ButtonPallet");
-    buttonPallet.onPointerClickObservable.add(async() => {
+    buttonPallet.onPointerClickObservable.add(async () => {
         let positionPallet = new Vector3()
         // Adjust the position of the box
         if (position !== 1) {
@@ -68,7 +70,7 @@ export async function makePallet(): Promise<Mesh> {
         }
 
         position = positionPallet.x + 4;
-        let resultPost = await handler.postPallet(positionPallet.x,positionPallet.y, positionPallet.z)
+        let resultPost = await handler.postPallet(positionPallet.x, positionPallet.y, positionPallet.z)
         if (resultPost.status == 201) {
             let pallet = await createPallet(positionPallet);
             pallet.id = resultPost.content[0].nid
@@ -76,7 +78,7 @@ export async function makePallet(): Promise<Mesh> {
         }
     });
 
-    var getGroundPosition = function () {
+    var getGroundPositionPallet = function () {
         var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (pallet) { return pallet == ground; });
         if (pickinfo.hit) {
             return pickinfo.pickedPoint;
@@ -93,6 +95,7 @@ export async function makePallet(): Promise<Mesh> {
             // outlinepallet
             outlinepallet = currentPallet;
             outlinepallet.renderOutline = false;
+            gizmoManager.positionGizmoEnabled = false;
         }
 
         currentPallet = pallet;
@@ -103,10 +106,10 @@ export async function makePallet(): Promise<Mesh> {
         outlinepallet.outlineColor = Color3.Green();
         outlinepallet.renderOutline = true;
 
-        startingPallet = getGroundPosition();
+        startingPallet = getGroundPositionPallet();
         if (startingPallet) { // we need to disconnect camera from canvas
             setTimeout(function () {
-                // camera.detachControl(canvas);
+                camera.detachControl(canvas);
             }, 0);
 
         }
@@ -117,10 +120,13 @@ export async function makePallet(): Promise<Mesh> {
             // currentPallet.material.wireframe = false;
 
             // // outlinepallet
-            // outlinepallet = currentPallet;
-            // outlinepallet.renderOutline = false;
-            // camera.attachControl(canvas, true);
+            outlinepallet = currentPallet;
+            outlinepallet.renderOutline = false;
+            camera.attachControl(canvas, true);
             startingPallet = null;
+            gizmoManager.positionGizmoEnabled = true
+            // Restrict gizmos to only spheres
+            gizmoManager.attachableMeshes = startingPallet
             return;
         }
     }
@@ -128,7 +134,7 @@ export async function makePallet(): Promise<Mesh> {
         if (!startingPallet) {
             return;
         }
-        var current = getGroundPosition();
+        var current = getGroundPositionPallet();
         if (!current) {
             return;
         }
@@ -145,6 +151,16 @@ export async function makePallet(): Promise<Mesh> {
 
                 if (pointerInfo.pickInfo.hit && pointerInfo.pickInfo.pickedMesh != ground) {
                     pointerDown(pointerInfo.pickInfo.pickedMesh)
+                }
+                else if (pointerInfo.pickInfo.pickedMesh == ground) {
+                    if (currentPallet) {
+                        // currentPallet.material.wireframe = false;
+                        // outline
+                        outlinepallet = currentPallet;
+                        outlinepallet.renderOutline = false;
+                        gizmoManager.positionGizmoEnabled = false
+                    }
+                    // console.log("down");
                 }
                 break;
             case PointerEventTypes.POINTERUP:

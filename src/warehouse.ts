@@ -14,7 +14,7 @@ export async function makeWare(): Promise<Mesh> {
     var wares = [];
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#101");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#118");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -45,7 +45,7 @@ export async function makeWare(): Promise<Mesh> {
     }
     async function createWarehouse(positionWarehouse: Vector3) {
         // Import the pallet
-        const result = await SceneLoader.ImportMeshAsync(null, "warehouse/", "eton.obj", scene, function (container) {
+        const result = await SceneLoader.ImportMeshAsync(null, "warehouse/", "warehouseeton.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
         ware = result.meshes[0];

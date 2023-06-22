@@ -19,7 +19,7 @@ export async function makeBox(): Promise<Mesh> {
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
 
 
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("L91IFF#101"); //L91IFF#73, L91IFF#76, L91IFF#75
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#118"); //L91IFF#73, L91IFF#76, L91IFF#75
 
 
 
@@ -116,7 +116,7 @@ export async function makeBox(): Promise<Mesh> {
         listMenuBox.isVisible = false;
     });
 
-    var getGroundPosition = function () {
+    var getGroundPositionBox = function () {
         var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (box) { return box == ground; });
         if (pickinfo.hit) {
             return pickinfo.pickedPoint;
@@ -150,10 +150,10 @@ export async function makeBox(): Promise<Mesh> {
                     outlinebox.outlineColor = Color3.Green();
                     outlinebox.renderOutline = true;
 
-                    startingBox = getGroundPosition();
+                    startingBox = getGroundPositionBox();
                     if (startingBox) { // we need to disconnect camera from canvas
                         setTimeout(function () {
-                            // camera.detachControl(canvas);
+                            camera.detachControl(canvas);
                         }, 0);
 
                     }
@@ -171,7 +171,9 @@ export async function makeBox(): Promise<Mesh> {
     var pointerUp = function (box: AbstractMesh) {
         try {
             if (startingBox) {
-                camera.attachControl(canvas, true);
+                outlinebox = currentBox;
+                outlinebox.renderOutline = false;
+                camera.attachControl(canvas, true)
                 startingBox = null;
 
                 location.isVisible = true;
@@ -193,7 +195,7 @@ export async function makeBox(): Promise<Mesh> {
         if (!startingBox) {
             return;
         }
-        var currentbox = getGroundPosition();
+        var currentbox = getGroundPositionBox();
         if (!currentbox) {
             return;
         }
