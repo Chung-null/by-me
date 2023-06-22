@@ -14,7 +14,7 @@ export async function makeWare(): Promise<Mesh> {
     var wares = [];
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#118");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#119");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -35,9 +35,9 @@ export async function makeWare(): Promise<Mesh> {
         let allWarehouseOnDB = await handler.get("warehouse")
         if (allWarehouseOnDB.status == 200) {
             allWarehouseOnDB.content.forEach(async function(element){
-                if (wares.filter(ware => ware.id == element.nid).length == 0) {// unique on array
+                if (wares.filter(ware => ware.id == element.id).length == 0) {// unique on array
                     let wareSync = await createWarehouse(new Vector3(element.x, element.y, element.z))
-                    wareSync.id = element.nid
+                    wareSync.id = element.id
                     wares.push(wareSync)
                 }
             });

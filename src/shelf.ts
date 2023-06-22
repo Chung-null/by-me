@@ -5,7 +5,7 @@ import * as GUI from "@babylonjs/gui";
 import { InputText } from '@babylonjs/gui';
 import { ground } from './ground';
 import { handlers } from './api/handlers';
-import { generateUniqueRandom } from './util';
+import { generateUniqueRandom, round2 } from './util';
 
 export async function makeShelf(): Promise<Mesh> {
     var startingPoint;
@@ -52,7 +52,7 @@ export async function makeShelf(): Promise<Mesh> {
     }
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#118");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#119");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -126,7 +126,7 @@ export async function makeShelf(): Promise<Mesh> {
         }
         let resultPost = await handler.postShelf(addNameShelf, addWeightShelf, addColumn, addRow, addDepth, offsetX, offsetY, offsetZ)
         if (resultPost.status == 201) {
-            let shelfImported = await importShelf(resultPost.content[0].nid, addNameShelf, addRow, addColumn, addDepth, offsetX, offsetY, offsetZ)
+            let shelfImported = await importShelf(resultPost.content.nid, addNameShelf, addRow, addColumn, addDepth, offsetX, offsetY, offsetZ)
             shelf.push(shelfImported)
         }
     }
@@ -165,8 +165,8 @@ export async function makeShelf(): Promise<Mesh> {
         let allShelfOnDB = await handler.get("shelf")
         if (allShelfOnDB.status == 200) {
             allShelfOnDB.content.forEach(async function(element){
-                if (shelf.filter(_shelf => _shelf.id == element.nid).length == 0) {// unique on array
-                    let shelfSync = await importShelf(element.nid, element.name, element.field_rows, element.field_columns, element.field_depth, element.x, element.y, element.z)
+                if (shelf.filter(_shelf => _shelf.id == element.id).length == 0) {// unique on array
+                    let shelfSync = await importShelf(element.id, element.name, element.field_rows, element.field_columns, element.field_depth, element.x, element.y, element.z)
                     if (shelfSync.name != "") {
                         shelf.push(shelfSync)
                     }
@@ -258,9 +258,9 @@ export async function makeShelf(): Promise<Mesh> {
                 camera.attachControl(canvas, true)
 
                 location.isVisible = true;
-                txtXposition.text = Number(currentMesh.position.x).toFixed(2)
-                txtYposition.text = Number(currentMesh.position.y).toFixed(2);
-                txtZposition.text = Number(currentMesh.position.z).toFixed(2);
+                txtXposition.text = round2(currentMesh.position.x) + ""
+                txtYposition.text = round2(currentMesh.position.y) + ""
+                txtZposition.text = round2(currentMesh.position.z) + ""
 
                 listeditshelf.isVisible = true;
                 txteditnameshelf.text = currentMesh.name.toString()

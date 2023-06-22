@@ -4,7 +4,7 @@ import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
 import { InputText } from '@babylonjs/gui';
-import { generateUniqueRandom } from './util';
+import { generateUniqueRandom, round2 } from './util';
 import { handlers } from './api/handlers';
 
 
@@ -81,9 +81,9 @@ export async function makeBox(): Promise<Mesh> {
         let allBoxOnDB = await handler.getBoxDefault()
         if (allBoxOnDB.status == 200) {
             allBoxOnDB.content.forEach(async function (element) {
-                if (boxes.filter(box => box.id == element.nid).length == 0) {// unique on array
+                if (boxes.filter(box => box.id == element.id).length == 0) {// unique on array
                     let boxSync = await createBox(element.name, new Vector3(element.x, element.y, element.z))
-                    boxSync.id = element.nid
+                    boxSync.id = element.id
                     boxes.push(boxSync)
                 }
             });
@@ -104,8 +104,11 @@ export async function makeBox(): Promise<Mesh> {
         let resultPost = await handler.postBox(nameBox, positionBox.x, positionBox.y, positionBox.z)
         if (resultPost.status == 201) {
             const box = await createBox(nameBox, positionBox);
-            box.id = resultPost.content[0].nid
+            box.id = resultPost.content.nid
             boxes.push(box)
+        }
+        else {
+            alert(resultPost.message)
         }
 
         // You can perform additional actions with the created box if needed
@@ -175,11 +178,13 @@ export async function makeBox(): Promise<Mesh> {
                 outlinebox.renderOutline = false;
                 camera.attachControl(canvas, true)
                 startingBox = null;
-
+                // if (Number(currentBox.position.x).toFixed(2) == "NaN") {
+                //     console.log(currentBox)
+                // }
                 location.isVisible = true;
-                txtXposition.text = Number(currentBox.position.x).toFixed(2)
-                txtYposition.text = Number(currentBox.position.y).toFixed(2);
-                txtZposition.text = Number(currentBox.position.z).toFixed(2);
+                txtXposition.text = round2(currentBox.position.x) + ""
+                txtYposition.text = round2(currentBox.position.y) + ""
+                txtZposition.text = round2(currentBox.position.z) + ""
 
                 listexportbox.isVisible = true;
                 txteditnamebox.text = currentBox.name.toString();
