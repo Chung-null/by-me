@@ -127,6 +127,7 @@ export async function makePallet(): Promise<Mesh> {
             gizmoManager.positionGizmoEnabled = true
             // Restrict gizmos to only spheres
             gizmoManager.attachableMeshes = startingPallet
+            handler.putPositionPallet(currentPallet.id, currentPallet.x, currentPallet.y, currentPallet.z)
             return;
         }
     }
