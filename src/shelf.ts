@@ -267,7 +267,7 @@ export async function makeShelf(): Promise<Mesh> {
 
                 listeditshelf.isVisible = true;
                 txteditnameshelf.text = currentMesh.name.toString()
-                handler.putPositionShelf(currentMesh.id, currentMesh.x, currentMesh.y, currentMesh.z)
+                handler.putPositionShelf(currentMesh.id, currentMesh.position.x, currentMesh.position.y, currentMesh.position.z)
 
                 //camera.attachControl(canvas, true);
                 startingPoint = null;

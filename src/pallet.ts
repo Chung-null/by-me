@@ -41,20 +41,20 @@ export async function makePallet(): Promise<Mesh> {
         if (allPalletOnDB.status == 200) {
             allPalletOnDB.content.forEach(async function (element) {
                 if (palletes.filter(pallet => pallet.id == element.id).length == 0) {// unique on array
-                    let palletSync = await createPallet(new Vector3(element.x, element.y, element.z))
-                    palletSync.id = element.id
+                    let palletSync = await createPallet(element.id,new Vector3(element.x, element.y, element.z))
                     palletes.push(palletSync)
                 }
             });
         }
     }
-    async function createPallet(position: Vector3) {
+    async function createPallet(id, position: Vector3) {
         // Import the pallet
         const result = await SceneLoader.ImportMeshAsync(null, "pallet/", "palleteton.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
-        pallet = result.meshes[0]
+        pallet = result.meshes[2]
         pallet.position = position
+        pallet.id = id
         return pallet
     }
 
@@ -72,8 +72,7 @@ export async function makePallet(): Promise<Mesh> {
         position = positionPallet.x + 4;
         let resultPost = await handler.postPallet(positionPallet.x, positionPallet.y, positionPallet.z)
         if (resultPost.status == 201) {
-            let pallet = await createPallet(positionPallet);
-            pallet.id = resultPost.content.nid
+            let pallet = await createPallet(resultPost.content.nid, positionPallet);
             palletes.push(pallet)
         }
     });
@@ -127,7 +126,7 @@ export async function makePallet(): Promise<Mesh> {
             gizmoManager.positionGizmoEnabled = true
             // Restrict gizmos to only spheres
             gizmoManager.attachableMeshes = startingPallet
-            handler.putPositionPallet(currentPallet.id, currentPallet.x, currentPallet.y, currentPallet.z)
+            handler.putPositionPallet(currentPallet.id, currentPallet.position.x, currentPallet.position.y, currentPallet.position.z)
             return;
         }
     }

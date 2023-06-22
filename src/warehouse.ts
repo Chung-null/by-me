@@ -36,21 +36,20 @@ export async function makeWare(): Promise<Mesh> {
         if (allWarehouseOnDB.status == 200) {
             allWarehouseOnDB.content.forEach(async function(element){
                 if (wares.filter(ware => ware.id == element.id).length == 0) {// unique on array
-                    let wareSync = await createWarehouse(new Vector3(element.x, element.y, element.z))
-                    wareSync.id = element.id
+                    let wareSync = await createWarehouse(element.id, new Vector3(element.x, element.y, element.z))
                     wares.push(wareSync)
                 }
             });
         }
     }
-    async function createWarehouse(positionWarehouse: Vector3) {
+    async function createWarehouse(id, positionWarehouse: Vector3) {
         // Import the pallet
         const result = await SceneLoader.ImportMeshAsync(null, "warehouse/", "warehouseeton.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
-        ware = result.meshes[0];
+        ware = result.meshes[2];
         ware.position = positionWarehouse
-
+        ware.id = id
 
         return ware
     }
@@ -69,8 +68,7 @@ export async function makeWare(): Promise<Mesh> {
         position = positionWarehouse.x + 4;
         let resultPost = await handler.postConveyor(positionWarehouse.x, positionWarehouse.y, positionWarehouse.z)
         if (resultPost.status == 201) {
-            let ware = await createWarehouse(positionWarehouse);
-            ware.id = resultPost.content[0].nid
+            let ware = await createWarehouse(resultPost.content[0].nid, positionWarehouse);
             wares.push(ware)
         }
     });
@@ -113,7 +111,7 @@ export async function makeWare(): Promise<Mesh> {
             // // outline
             camera.attachControl(canvas, true);
             startingWare = null;
-            handler.putPositionWarehouse(currentWare.id, currentWare.x, currentWare.y, currentWare.z)
+            handler.putPositionWarehouse(currentWare.id, currentWare.position.x, currentWare.position.y, currentWare.position.z)
             return;
         }
     }
