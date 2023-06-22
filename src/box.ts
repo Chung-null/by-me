@@ -4,7 +4,7 @@ import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
 import { InputText } from '@babylonjs/gui';
-import { generateUniqueRandom } from './util';
+import { generateUniqueRandom, round2 } from './util';
 import { handlers } from './api/handlers';
 
 
@@ -107,6 +107,9 @@ export async function makeBox(): Promise<Mesh> {
             box.id = resultPost.content.nid
             boxes.push(box)
         }
+        else {
+            alert(resultPost.message)
+        }
 
         // You can perform additional actions with the created box if needed
     });
@@ -175,11 +178,13 @@ export async function makeBox(): Promise<Mesh> {
                 outlinebox.renderOutline = false;
                 camera.attachControl(canvas, true)
                 startingBox = null;
-
+                // if (Number(currentBox.position.x).toFixed(2) == "NaN") {
+                //     console.log(currentBox)
+                // }
                 location.isVisible = true;
-                txtXposition.text = Number(currentBox.position.x).toFixed(2)
-                txtYposition.text = Number(currentBox.position.y).toFixed(2);
-                txtZposition.text = Number(currentBox.position.z).toFixed(2);
+                txtXposition.text = round2(currentBox.position.x) + ""
+                txtYposition.text = round2(currentBox.position.y) + ""
+                txtZposition.text = round2(currentBox.position.z) + ""
 
                 listexportbox.isVisible = true;
                 txteditnamebox.text = currentBox.name.toString();

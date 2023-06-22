@@ -14,7 +14,7 @@ export async function makeWare(): Promise<Mesh> {
     var wares = [];
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#118");
+    let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#119");
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
