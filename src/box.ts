@@ -4,7 +4,7 @@ import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
 import { InputText } from '@babylonjs/gui';
-import { generateUniqueRandom, round2 } from './util';
+import { generateUniqueRandom, getCurrentDate, round2 } from './util';
 import { handlers } from './api/handlers';
 
 
@@ -73,7 +73,7 @@ export async function makeBox(): Promise<Mesh> {
         // result.meshes[1].position = position
         box = result.meshes[1]
         box.name = "box" + name
-        box.position = position
+        box.position.set(position.x, position.y,position.z)
         console.log(result.meshes.length)
         return result.meshes[0]
     }
@@ -82,7 +82,8 @@ export async function makeBox(): Promise<Mesh> {
         if (allBoxOnDB.status == 200) {
             allBoxOnDB.content.forEach(async function (element) {
                 if (boxes.filter(box => box.id == element.id).length == 0) {// unique on array
-                    let boxSync = await createBox(element.name, new Vector3(element.x, element.y, element.z))
+                    let position = new Vector3(element.x, element.y, element.z)
+                    let boxSync = await createBox(element.name, position)
                     boxSync.id = element.id
                     boxes.push(boxSync)
                 }
@@ -113,7 +114,12 @@ export async function makeBox(): Promise<Mesh> {
 
         // You can perform additional actions with the created box if needed
     });
-
+    btnexportbox.onPointerClickObservable.add(async () => {
+        handler.putExportBox(currentBox.id, getCurrentDate().toString())
+    })
+    btneditnamebox.onPointerClickObservable.add(async () => {
+        handler.putNameBox(currentBox.id, txteditnamebox.text)
+    })
     //Close ListMenuBox
     btnclosebox.onPointerUpObservable.add(() => {
         listMenuBox.isVisible = false;
@@ -178,16 +184,16 @@ export async function makeBox(): Promise<Mesh> {
                 outlinebox.renderOutline = false;
                 camera.attachControl(canvas, true)
                 startingBox = null;
-                // if (Number(currentBox.position.x).toFixed(2) == "NaN") {
-                //     console.log(currentBox)
-                // }
+                if (Number(currentBox.position.x).toFixed(2) == "NaN") {
+                    console.log(currentBox)
+                }
                 location.isVisible = true;
                 txtXposition.text = round2(currentBox.position.x) + ""
                 txtYposition.text = round2(currentBox.position.y) + ""
                 txtZposition.text = round2(currentBox.position.z) + ""
-
+                handler.putPositionBox(currentBox.id, currentBox.x, currentBox.y, currentBox.z)
                 listexportbox.isVisible = true;
-                txteditnamebox.text = currentBox.name.toString();
+                txteditnamebox.text = currentBox.name.toString().replace("box","");
                 return;
             }
         }

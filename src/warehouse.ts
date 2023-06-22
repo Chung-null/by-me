@@ -113,6 +113,7 @@ export async function makeWare(): Promise<Mesh> {
             // // outline
             camera.attachControl(canvas, true);
             startingWare = null;
+            handler.putPositionWarehouse(currentWare.id, currentWare.x, currentWare.y, currentWare.z)
             return;
         }
     }

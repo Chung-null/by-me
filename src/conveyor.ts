@@ -109,6 +109,7 @@ export async function makeConveyor(): Promise<Mesh> {
             outlineconveyor.renderOutline = false;
             camera.attachControl(canvas, true);
             startingConveyor = null;
+            handler.putPositionConveyor(currentConveyor.id, currentConveyor.x, currentConveyor.y, currentConveyor.z)
             return;
         }
     }
