@@ -191,6 +191,9 @@ export async function makeShelf(): Promise<Mesh> {
             alert("Có lỗi xảy ra! Có thể nguyên nhân là do bạn để trống thuộc tính nào đó")
         }
     })
+    btneditshelf.onPointerClickObservable.add(() => {
+        handler.putNameShelf(currentMesh.id, txteditnameshelf.text)
+    })
     btncloseshelf.onPointerUpObservable.add(() => {
         listMenuShelf.isVisible = false;
     });
@@ -264,7 +267,7 @@ export async function makeShelf(): Promise<Mesh> {
 
                 listeditshelf.isVisible = true;
                 txteditnameshelf.text = currentMesh.name.toString()
-                
+                handler.putPositionShelf(currentMesh.id, currentMesh.x, currentMesh.y, currentMesh.z)
 
                 //camera.attachControl(canvas, true);
                 startingPoint = null;
