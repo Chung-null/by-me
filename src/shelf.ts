@@ -5,7 +5,7 @@ import * as GUI from "@babylonjs/gui";
 import { InputText } from '@babylonjs/gui';
 import { ground } from './ground';
 import { handlers } from './api/handlers';
-import { generateUniqueRandom } from './util';
+import { generateUniqueRandom, round2 } from './util';
 
 export async function makeShelf(): Promise<Mesh> {
     var startingPoint;
@@ -258,9 +258,9 @@ export async function makeShelf(): Promise<Mesh> {
                 camera.attachControl(canvas, true)
 
                 location.isVisible = true;
-                txtXposition.text = Number(currentMesh.position.x).toFixed(2)
-                txtYposition.text = Number(currentMesh.position.y).toFixed(2);
-                txtZposition.text = Number(currentMesh.position.z).toFixed(2);
+                txtXposition.text = round2(currentMesh.position.x) + ""
+                txtYposition.text = round2(currentMesh.position.y) + ""
+                txtZposition.text = round2(currentMesh.position.z) + ""
 
                 listeditshelf.isVisible = true;
                 txteditnameshelf.text = currentMesh.name.toString()

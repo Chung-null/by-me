@@ -37,3 +37,6 @@ export function generateUniqueRandom(maxNr) {
         }
     }
 }
+export function round2(number: number) {
+    return Math.round(number * 100) / 100
+}
