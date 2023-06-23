@@ -132,10 +132,12 @@ export class handlers {
         return await this.put(id, dataPost)
     }
     async putPositionShelf(id: number, x: number, y: number, z: number) {
+        // if (id && x && y && z){
         let putShelf = new shelf()
         putShelf.setPosition(Number(round2(x)), Number(round2(x)), Number(round2(z)))
         let dataPost = putShelf.getPutPositionShelf()
         return await this.put(id, dataPost)
+        // }
     }
 
     //box

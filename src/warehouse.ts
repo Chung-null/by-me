@@ -68,12 +68,12 @@ export async function makeWare(): Promise<Mesh> {
         position = positionWarehouse.x + 4;
         let resultPost = await handler.postConveyor(positionWarehouse.x, positionWarehouse.y, positionWarehouse.z)
         if (resultPost.status == 201) {
-            let ware = await createWarehouse(resultPost.content[0].nid, positionWarehouse);
+            let ware = await createWarehouse(resultPost.content.nid, positionWarehouse);
             wares.push(ware)
         }
     });
 
-    var getGroundPosition = function () {
+    var getGroundPositionWare = function () {
         var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (house) { return house == ground; });
         if (pickinfo.hit) {
             return pickinfo.pickedPoint;
@@ -97,7 +97,7 @@ export async function makeWare(): Promise<Mesh> {
         outlineware.outlineColor = Color3.Green();
         outlineware.renderOutline = true;
 
-        startingWare = getGroundPosition();
+        startingWare = getGroundPositionWare();
         if (startingWare) { // we need to disconnect camera from canvas
             setTimeout(function () {
                 // camera.detachControl(canvas);
@@ -109,9 +109,11 @@ export async function makeWare(): Promise<Mesh> {
     var pointerUp = async function () {
         if (startingWare) {
             // // outline
+            outlineware = currentWare;
+            outlineware.renderOutline = false;
             camera.attachControl(canvas, true);
             startingWare = null;
-            await handler.putPositionWarehouse(currentWare.id, currentWare.x, currentWare.y, currentWare.z)
+            await handler.putPositionWarehouse(currentWare.id, currentWare.position.x, currentWare.position.y, currentWare.position.z)
             return;
         }
     }
@@ -119,15 +121,15 @@ export async function makeWare(): Promise<Mesh> {
         if (!startingWare) {
             return;
         }
-        var current = getGroundPosition();
-        if (!current) {
+        var currentware = getGroundPositionWare();
+        if (!currentware) {
             return;
         }
 
-        var diff = current.subtract(startingWare);
+        var diff = currentware.subtract(startingWare);
         currentWare.position.addInPlace(diff);
 
-        startingWare = current;
+        startingWare = currentware;
 
     }
     scene.onPointerObservable.add(async (pointerInfo) => {

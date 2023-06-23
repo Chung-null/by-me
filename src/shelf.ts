@@ -89,7 +89,7 @@ export async function makeShelf(): Promise<Mesh> {
     let txtaddDepth = <InputText>advancedTexture.getControlByName("InputTextDepth");
     //Edit Shelf
     let txteditnameshelf = <InputText>advancedTexture.getControlByName("InputEditNameShelf");
-    let txteditweightshelf = <InputText>advancedTexture.getControlByName("InputEditWeightShelf");
+   
     // handle db 
     let handler = new handlers()
     var shelfMaterial = new StandardMaterial("shelfmat", scene);
@@ -194,12 +194,13 @@ export async function makeShelf(): Promise<Mesh> {
     btneditshelf.onPointerClickObservable.add(async () => {
         currentMesh.name = txteditnameshelf
         await handler.putNameShelf(currentMesh.id, txteditnameshelf.text)
+        listeditshelf.isVisible = false;
     })
     btncloseshelf.onPointerUpObservable.add(() => {
         listMenuShelf.isVisible = false;
     });
 
-    var getGroundPosition = function () {
+    var getGroundPositionShelf = function () {
         var pickinfo = scene.pick(scene.pointerX, scene.pointerY, function (mesh) { return mesh == ground; });
         if (pickinfo.hit) {
             return pickinfo.pickedPoint;
@@ -234,7 +235,7 @@ export async function makeShelf(): Promise<Mesh> {
                     outline.outlineColor = Color3.Green();
                     outline.renderOutline = true;
 
-                    startingPoint = getGroundPosition();
+                    startingPoint = getGroundPositionShelf();
                     if (startingPoint) { // we need to disconnect camera from canvas
                         setTimeout(function () {
                             camera.detachControl(canvas);
@@ -268,8 +269,7 @@ export async function makeShelf(): Promise<Mesh> {
 
                 listeditshelf.isVisible = true;
                 txteditnameshelf.text = currentMesh.name.toString()
-                await handler.putPositionShelf(currentMesh.id, currentMesh.x, currentMesh.y, currentMesh.z)
-
+                await handler.putPositionShelf(currentMesh.id, currentMesh.position.x, currentMesh.position.y, currentMesh.position.z)
                 //camera.attachControl(canvas, true);
                 startingPoint = null;
 
@@ -283,7 +283,7 @@ export async function makeShelf(): Promise<Mesh> {
         if (!startingPoint) {
             return;
         }
-        var curreenShelf = getGroundPosition();
+        var curreenShelf = getGroundPositionShelf();
         if (!curreenShelf) {
             return;
         }
@@ -347,6 +347,7 @@ export async function makeShelf(): Promise<Mesh> {
             currentMesh.dispose();
             currentMesh = null;
         }
+        listeditshelf.isVisible = false;
     });
 
 

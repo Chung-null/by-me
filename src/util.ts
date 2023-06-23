@@ -38,8 +38,13 @@ export function generateUniqueRandom(maxNr) {
     }
 }
 export function round2(number: number) {
-    let numberToString = number + ""
+    if(number){
+        let numberToString = number + ""
     let splitNumber = numberToString.split(".")
-    let decimal = splitNumber[1].slice(0,2)
+    let decimal = "00"
+    if(splitNumber.length > 1) { 
+        decimal = splitNumber[1].slice(0,2)
+    }
     return splitNumber[0]+"."+decimal
+    }
 }

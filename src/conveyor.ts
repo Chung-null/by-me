@@ -108,7 +108,7 @@ export async function makeConveyor(): Promise<Mesh> {
             outlineconveyor.renderOutline = false;
             camera.attachControl(canvas, true);
             startingConveyor = null;
-            await handler.putPositionConveyor(currentConveyor.id, currentConveyor.x, currentConveyor.y, currentConveyor.z)
+            await handler.putPositionConveyor(currentConveyor.id, currentConveyor.position.x, currentConveyor.position.y, currentConveyor.position.z)
             return;
         }
     }
@@ -116,15 +116,15 @@ export async function makeConveyor(): Promise<Mesh> {
         if (!startingConveyor) {
             return;
         }
-        var current = getGroundPositionConvey();
-        if (!current) {
+        var currentconveyor = getGroundPositionConvey();
+        if (!currentconveyor) {
             return;
         }
 
-        var diff = current.subtract(startingConveyor);
+        var diff = currentconveyor.subtract(startingConveyor);
         currentConveyor.position.addInPlace(diff);
 
-        startingConveyor = current;
+        startingConveyor = currentconveyor;
 
     }
     scene.onPointerObservable.add((pointerInfo) => {

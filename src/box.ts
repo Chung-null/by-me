@@ -17,12 +17,7 @@ export async function makeBox(): Promise<Mesh> {
     var boxes = [];
     // Load in a full screen GUI from the snippet server
     let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-
-
     let loadedGUI = await advancedTexture.parseFromSnippetAsync("D04P4Z#119"); //L91IFF#73, L91IFF#76, L91IFF#75
-
-
-
     advancedTexture.idealWidth = 1920;
     advancedTexture.idealHeight = 1080;
     //Close all
@@ -60,9 +55,7 @@ export async function makeBox(): Promise<Mesh> {
 
     //Get Info Box
     let txtBoxNameInfo = <InputText>advancedTexture.getControlByName("InputNameBoxinfo");
-    // let txtImportInfo = <InputText>advancedTexture.getControlByName("InputImportBoxinfo");
-    // let txtExportInfo = <InputText>advancedTexture.getControlByName("InputExportBoxinfo");
-
+   
     //  handle API
     let handler = new handlers()
     // Function to create a box and return it as a Promise
@@ -81,7 +74,7 @@ export async function makeBox(): Promise<Mesh> {
         let allBoxOnDB = await handler.getBoxDefault()
         if (allBoxOnDB.status == 200) {
             allBoxOnDB.content.forEach(async function (element) {
-                if (boxes.filter(box => box.id == element.id).length == 0) {// unique on array
+                if (boxes.filter(box => box.id == element.id).length == 0 && element.export_date == "") {// unique on array
                     let position = new Vector3(element.x, element.y, element.z)
                     let boxSync = await createBox(element.name, position)
                     boxSync.id = element.id
@@ -116,6 +109,8 @@ export async function makeBox(): Promise<Mesh> {
     });
     btnexportbox.onPointerClickObservable.add(async () => {
         await handler.putExportBox(currentBox.id, getCurrentDate().toString())
+        currentBox.setEnabled(false);
+        listexportbox.isVisible = false;
     })
     btneditnamebox.onPointerClickObservable.add(async () => {
         currentBox.name = txteditnamebox.text
@@ -274,6 +269,7 @@ export async function makeBox(): Promise<Mesh> {
             currentBox.dispose();
             currentBox = null;
         }
+        listexportbox.isVisible = false;
     });
 
     return box

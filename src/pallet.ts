@@ -86,15 +86,11 @@ export async function makePallet(): Promise<Mesh> {
         return null;
     }
     var pointerDown = function (pallet) {
-        console.log(pallet)
-        console.log(palletes)
-        console.log(pallet.name, "plalelel")
         if (currentPallet) {
-            // currentPallet.material.wireframe = false;
             // outlinepallet
             outlinepallet = currentPallet;
             outlinepallet.renderOutline = false;
-            gizmoManager.positionGizmoEnabled = false;
+            // gizmoManager.positionGizmoEnabled = false;
         }
 
         currentPallet = pallet;
@@ -126,7 +122,7 @@ export async function makePallet(): Promise<Mesh> {
             gizmoManager.positionGizmoEnabled = true
             // Restrict gizmos to only spheres
             gizmoManager.attachableMeshes = startingPallet
-            await handler.putPositionPallet(currentPallet.id, currentPallet.x, currentPallet.y, currentPallet.z)
+            await handler.putPositionPallet(currentPallet.id, currentPallet.position.x, currentPallet.position.y, currentPallet.position.z)
             return;
         }
     }
@@ -134,15 +130,15 @@ export async function makePallet(): Promise<Mesh> {
         if (!startingPallet) {
             return;
         }
-        var current = getGroundPositionPallet();
-        if (!current) {
+        var currentpallet = getGroundPositionPallet();
+        if (!currentpallet) {
             return;
         }
 
-        var diff = current.subtract(startingPallet);
+        var diff = currentpallet.subtract(startingPallet);
         currentPallet.position.addInPlace(diff);
 
-        startingPallet = current;
+        startingPallet = currentpallet;
 
     }
     scene.onPointerObservable.add((pointerInfo) => {
