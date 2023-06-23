@@ -118,6 +118,7 @@ export async function makeBox(): Promise<Mesh> {
         handler.putExportBox(currentBox.id, getCurrentDate().toString())
     })
     btneditnamebox.onPointerClickObservable.add(async () => {
+        currentBox.name = txteditnamebox.text
         handler.putNameBox(currentBox.id, txteditnamebox.text)
     })
     //Close ListMenuBox

@@ -192,6 +192,7 @@ export async function makeShelf(): Promise<Mesh> {
         }
     })
     btneditshelf.onPointerClickObservable.add(() => {
+        currentMesh.name = txteditnameshelf
         handler.putNameShelf(currentMesh.id, txteditnameshelf.text)
     })
     btncloseshelf.onPointerUpObservable.add(() => {
