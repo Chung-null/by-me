@@ -194,8 +194,7 @@ export async function makeBox(): Promise<Mesh> {
                         txtXposition.text = round2(currentBox.position.x) + ""
                         txtYposition.text = round2(currentBox.position.y) + ""
                         txtZposition.text = round2(currentBox.position.z) + ""
-                        if(currentBox.id)
-                        {handler.putPositionBox(currentBox.id, currentBox.position.x, currentBox.position.y, currentBox.position.z)}
+                        if (currentBox.id) { handler.putPositionBox(currentBox.id, currentBox.position.x, currentBox.position.y, currentBox.position.z) }
                         listexportbox.isVisible = true;
                         txteditnamebox.text = currentBox.name.toString().replace("box", "");
                         return;
