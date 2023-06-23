@@ -191,9 +191,9 @@ export async function makeShelf(): Promise<Mesh> {
             alert("Có lỗi xảy ra! Có thể nguyên nhân là do bạn để trống thuộc tính nào đó")
         }
     })
-    btneditshelf.onPointerClickObservable.add(() => {
+    btneditshelf.onPointerClickObservable.add(async () => {
         currentMesh.name = txteditnameshelf
-        handler.putNameShelf(currentMesh.id, txteditnameshelf.text)
+        await handler.putNameShelf(currentMesh.id, txteditnameshelf.text)
     })
     btncloseshelf.onPointerUpObservable.add(() => {
         listMenuShelf.isVisible = false;
@@ -251,7 +251,7 @@ export async function makeShelf(): Promise<Mesh> {
             console.log(e)
         }
     }
-    var pointerUp = function (mesh: AbstractMesh) {
+    var pointerUp = async function (mesh: AbstractMesh) {
         try {
             if (startingPoint) {
                 // currentMesh.material.wireframe = false;
@@ -268,7 +268,7 @@ export async function makeShelf(): Promise<Mesh> {
 
                 listeditshelf.isVisible = true;
                 txteditnameshelf.text = currentMesh.name.toString()
-                handler.putPositionShelf(currentMesh.id, currentMesh.x, currentMesh.y, currentMesh.z)
+                await handler.putPositionShelf(currentMesh.id, currentMesh.x, currentMesh.y, currentMesh.z)
 
                 //camera.attachControl(canvas, true);
                 startingPoint = null;
@@ -294,7 +294,7 @@ export async function makeShelf(): Promise<Mesh> {
         startingPoint = curreenShelf;
 
     }
-    scene.onPointerObservable.add((pointerInfo, event) => {
+    scene.onPointerObservable.add(async (pointerInfo, event) => {
         switch (pointerInfo.type) {
             case PointerEventTypes.POINTERDOWN:
 
@@ -330,7 +330,7 @@ export async function makeShelf(): Promise<Mesh> {
 
                 break;
             case PointerEventTypes.POINTERUP:
-                pointerUp(pointerInfo.pickInfo.pickedMesh);
+                await pointerUp(pointerInfo.pickInfo.pickedMesh);
                 break;
             case PointerEventTypes.POINTERMOVE:
                 pointerMove();
@@ -341,9 +341,9 @@ export async function makeShelf(): Promise<Mesh> {
     // setInterval(syncShelfFromDB, 2000)
     syncShelfFromDB()
     // delete selected meshes
-    btndelete.onPointerClickObservable.add(() => {
+    btndelete.onPointerClickObservable.add(async () => {
         if (currentMesh != null) {
-            handler.deleteShelf(currentMesh.id)
+            await handler.deleteShelf(currentMesh.id)
             currentMesh.dispose();
             currentMesh = null;
         }

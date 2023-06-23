@@ -108,12 +108,12 @@ export async function makeWare(): Promise<Mesh> {
         }
 
     }
-    var pointerUp = function () {
+    var pointerUp = async function () {
         if (startingWare) {
             // // outline
             camera.attachControl(canvas, true);
             startingWare = null;
-            handler.putPositionWarehouse(currentWare.id, currentWare.x, currentWare.y, currentWare.z)
+            await handler.putPositionWarehouse(currentWare.id, currentWare.x, currentWare.y, currentWare.z)
             return;
         }
     }
@@ -132,7 +132,7 @@ export async function makeWare(): Promise<Mesh> {
         startingWare = current;
 
     }
-    scene.onPointerObservable.add((pointerInfo) => {
+    scene.onPointerObservable.add(async (pointerInfo) => {
         switch (pointerInfo.type) {
             case PointerEventTypes.POINTERDOWN:
 
@@ -141,7 +141,7 @@ export async function makeWare(): Promise<Mesh> {
                 }
                 break;
             case PointerEventTypes.POINTERUP:
-                pointerUp();
+                await pointerUp();
                 break;
             case PointerEventTypes.POINTERMOVE:
                 pointerMove();
@@ -149,9 +149,9 @@ export async function makeWare(): Promise<Mesh> {
         }
     });
     // delete selected meshes
-    btndelete.onPointerClickObservable.add(() => {
+    btndelete.onPointerClickObservable.add(async () => {
         if (currentWare != null) {
-            handler.deleteBox(currentWare.id)
+            await handler.deleteBox(currentWare.id)
             currentWare.dispose();
             currentWare = null;
         }
