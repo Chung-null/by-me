@@ -180,23 +180,29 @@ export async function makeBox(): Promise<Mesh> {
 
     var pointerUp = function (box: AbstractMesh) {
         try {
-            if (startingBox) {
-                outlinebox = currentBox;
-                outlinebox.renderOutline = false;
-                camera.attachControl(canvas, true)
-                startingBox = null;
-                if (round2(currentBox.position.x) + "" == "NaN") {
-                    console.log(currentBox)
+            if (box) {
+                if (box.name.toLowerCase().includes("box")) {
+                    if (startingBox) {
+                        outlinebox = currentBox;
+                        outlinebox.renderOutline = false;
+                        camera.attachControl(canvas, true)
+                        startingBox = null;
+                        if (round2(currentBox.position.x) + "" == "NaN") {
+                            console.log(currentBox)
+                        }
+                        location.isVisible = true;
+                        txtXposition.text = round2(currentBox.position.x) + ""
+                        txtYposition.text = round2(currentBox.position.y) + ""
+                        txtZposition.text = round2(currentBox.position.z) + ""
+                        if(currentBox.id)
+                        {handler.putPositionBox(currentBox.id, currentBox.position.x, currentBox.position.y, currentBox.position.z)}
+                        listexportbox.isVisible = true;
+                        txteditnamebox.text = currentBox.name.toString().replace("box", "");
+                        return;
+                    }
                 }
-                location.isVisible = true;
-                txtXposition.text = round2(currentBox.position.x) + ""
-                txtYposition.text = round2(currentBox.position.y) + ""
-                txtZposition.text = round2(currentBox.position.z) + ""
-                handler.putPositionBox(currentBox.id, currentBox.position.x, currentBox.position.y, currentBox.position.z)
-                listexportbox.isVisible = true;
-                txteditnamebox.text = currentBox.name.toString().replace("box","");
-                return;
             }
+
         }
         catch (e) {
             console.log(e)
