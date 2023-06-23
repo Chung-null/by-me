@@ -149,6 +149,7 @@ export async function makeWare(): Promise<Mesh> {
     // delete selected meshes
     btndelete.onPointerClickObservable.add(() => {
         if (currentWare != null) {
+            handler.deleteBox(currentWare.id)
             currentWare.dispose();
             currentWare = null;
         }
