@@ -178,7 +178,7 @@ export async function makeBox(): Promise<Mesh> {
         }
     }
 
-    var pointerUp = function (box: AbstractMesh) {
+    var pointerUp = async function (box: AbstractMesh) {
         try {
             if (box) {
                 if (box.name.toLowerCase().includes("box")) {
@@ -194,7 +194,7 @@ export async function makeBox(): Promise<Mesh> {
                         txtXposition.text = round2(currentBox.position.x) + ""
                         txtYposition.text = round2(currentBox.position.y) + ""
                         txtZposition.text = round2(currentBox.position.z) + ""
-                        if (currentBox.id) { handler.putPositionBox(currentBox.id, currentBox.position.x, currentBox.position.y, currentBox.position.z) }
+                        if (currentBox.id) { await handler.putPositionBox(currentBox.id, currentBox.position.x, currentBox.position.y, currentBox.position.z) }
                         listexportbox.isVisible = true;
                         txteditnamebox.text = currentBox.name.toString().replace("box", "");
                         return;
@@ -224,7 +224,7 @@ export async function makeBox(): Promise<Mesh> {
 
     }
 
-    scene.onPointerObservable.add((pointerInfo) => {
+    scene.onPointerObservable.add(async(pointerInfo) => {
         switch (pointerInfo.type) {
             case PointerEventTypes.POINTERDOWN:
 
@@ -258,7 +258,7 @@ export async function makeBox(): Promise<Mesh> {
 
                 break;
             case PointerEventTypes.POINTERUP:
-                pointerUp(pointerInfo.pickInfo.pickedMesh);
+                await pointerUp(pointerInfo.pickInfo.pickedMesh);
                 break;
             case PointerEventTypes.POINTERMOVE:
                 pointerMove();
