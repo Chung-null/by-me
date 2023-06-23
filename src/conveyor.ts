@@ -37,19 +37,19 @@ export async function makeConveyor(): Promise<Mesh> {
         if (allConveyorOnDB.status == 200) {
             allConveyorOnDB.content.forEach(async function (element) {
                 if (conveyors.filter(conveyor => conveyor.id == element.id).length == 0) {// unique on array
-                    let conveyorSync = await createConveyor(new Vector3(element.x, element.y, element.z))
-                    conveyorSync.id = element.id
+                    let conveyorSync = await createConveyor(element.id, new Vector3(element.x, element.y, element.z))
                     conveyors.push(conveyorSync)
                 }
             });
         }
     }
-    async function createConveyor(position: Vector3) {
+    async function createConveyor(id, position: Vector3) {
         const conveyorhouse = await SceneLoader.ImportMeshAsync(null, "conveyor/", "conveyor.obj", scene, function (container) {
             // newMeshes[0].getChildMeshes()[0].metadata = "cannon";
         });
-        const conveyor = conveyorhouse.meshes[0];
+        const conveyor = conveyorhouse.meshes[1];
         conveyor.position = position
+        conveyor.id = id
         return conveyor
     }
     //Event click button Shelfinfo
@@ -66,8 +66,7 @@ export async function makeConveyor(): Promise<Mesh> {
         position = positionConveyor.x + 4;
         let resultPost = await handler.postConveyor(positionConveyor.x, positionConveyor.y, positionConveyor.z)
         if (resultPost.status == 201) {
-            let conve = await createConveyor(positionConveyor);
-            conve.id = resultPost.content.nid
+            let conve = await createConveyor(resultPost.content.nid, positionConveyor);
             conveyors.push(conve)
         }
     });

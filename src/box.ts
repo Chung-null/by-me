@@ -185,7 +185,7 @@ export async function makeBox(): Promise<Mesh> {
                 outlinebox.renderOutline = false;
                 camera.attachControl(canvas, true)
                 startingBox = null;
-                if (Number(currentBox.position.x).toFixed(2) == "NaN") {
+                if (round2(currentBox.position.x) + "" == "NaN") {
                     console.log(currentBox)
                 }
                 location.isVisible = true;
