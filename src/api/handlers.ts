@@ -1,6 +1,6 @@
 import { shelf } from "./object/shelf";
 import { box } from "./object/box";
-import { getCurrentDate } from "../util";
+import { getCurrentDate, round2 } from "../util";
 import { warehouse } from "./object/warehouse";
 import { pallet } from "./object/pallet";
 import { conveyor } from "./object/conveyor";
@@ -133,7 +133,7 @@ export class handlers {
     }
     async putPositionShelf(id: number, x: number, y: number, z: number) {
         let putShelf = new shelf()
-        putShelf.setPosition(x, y, z)
+        putShelf.setPosition(Number(round2(x)), Number(round2(x)), Number(round2(z)))
         let dataPost = putShelf.getPutPositionShelf()
         return await this.put(id, dataPost)
     }
@@ -164,19 +164,22 @@ export class handlers {
 
     //warehouse
     async putPositionWarehouse(id: number, x: number, y: number, z: number) {
-        let putWarehouse = new warehouse(x, y, z)
+        let putWarehouse = new warehouse()
+        putWarehouse.setPosition(Number(round2(x)), Number(round2(x)), Number(round2(z)))
         let dataPost = putWarehouse.getPutPositionWarehouse()
         return await this.put(id, dataPost)
     }
     //pallet
     async putPositionPallet(id: number, x: number, y: number, z: number) {
-        let putPallet= new pallet(x, y, z)
+        let putPallet= new pallet()
+        putPallet.setPosition(Number(round2(x)), Number(round2(x)), Number(round2(z)))
         let dataPost = putPallet.getPutPositionPallet()
         return await this.put(id, dataPost)
     }
     //warehouse
     async putPositionConveyor(id: number, x: number, y: number, z: number) {
-        let putConveyor = new conveyor(x, y, z)
+        let putConveyor = new conveyor()
+        putConveyor.setPosition(Number(round2(x)), Number(round2(x)), Number(round2(z)))
         let dataPost = putConveyor.getPutPositionConveyor()
         return await this.put(id, dataPost)
     }
