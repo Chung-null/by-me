@@ -263,9 +263,9 @@ export async function makeBox(): Promise<Mesh> {
     // setInterval(syncBoxFromDB, 2000)
     await syncBoxFromDB()
     // delete selected boxes
-    btndelete.onPointerClickObservable.add(() => {
+    btndelete.onPointerClickObservable.add(async () => {
         if (currentBox != null) {
-            handler.deleteBox(currentBox.id)
+            await handler.deleteBox(currentBox.id)
             currentBox.dispose();
             currentBox = null;
         }
