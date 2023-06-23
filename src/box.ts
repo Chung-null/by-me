@@ -265,6 +265,7 @@ export async function makeBox(): Promise<Mesh> {
     // delete selected boxes
     btndelete.onPointerClickObservable.add(() => {
         if (currentBox != null) {
+            handler.deleteBox(currentBox.id)
             currentBox.dispose();
             currentBox = null;
         }

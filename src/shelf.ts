@@ -343,6 +343,7 @@ export async function makeShelf(): Promise<Mesh> {
     // delete selected meshes
     btndelete.onPointerClickObservable.add(() => {
         if (currentMesh != null) {
+            handler.deleteShelf(currentMesh.id)
             currentMesh.dispose();
             currentMesh = null;
         }
