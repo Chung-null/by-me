@@ -66,17 +66,16 @@ export async function makeBox(): Promise<Mesh> {
     //  handle API
     let handler = new handlers()
     // Function to create a box and return it as a Promise
-    async function createBox(id, name: string, position: Vector3) {
+    async function createBox(name: string, position: Vector3) {
         // Import the box
         const result = await SceneLoader.ImportMeshAsync(null, "box/", "boxeton1.obj", scene);
         // result.meshes[1].name = name
         // result.meshes[1].position = position
         box = result.meshes[1]
         box.name = "box" + name
-        box.id = id
-        box.position.set(position.x, position.y,position.z)
+        box.position = position
         console.log(result.meshes.length)
-        return result.meshes[0]
+        return box
     }
     async function syncBoxFromDB() {
         let allBoxOnDB = await handler.getBoxDefault()
@@ -84,7 +83,7 @@ export async function makeBox(): Promise<Mesh> {
             allBoxOnDB.content.forEach(async function (element) {
                 if (boxes.filter(box => box.id == element.id).length == 0) {// unique on array
                     let position = new Vector3(element.x, element.y, element.z)
-                    let boxSync = await createBox(element.id, element.name, position)
+                    let boxSync = await createBox(element.name, position)
                     boxSync.id = element.id
                     boxes.push(boxSync)
                 }
@@ -105,7 +104,8 @@ export async function makeBox(): Promise<Mesh> {
         position = positionBox.x + 4;
         let resultPost = await handler.postBox(nameBox, positionBox.x, positionBox.y, positionBox.z)
         if (resultPost.status == 201) {
-            const box = await createBox(resultPost.content.nid, nameBox, positionBox);
+            const box = await createBox(nameBox, positionBox);
+            box.id = resultPost.content.nid
             boxes.push(box)
         }
         else {
@@ -177,7 +177,7 @@ export async function makeBox(): Promise<Mesh> {
         }
     }
 
-    var pointerUp = async function (box: AbstractMesh) {
+    var pointerUp = function (box: AbstractMesh) {
         try {
             if (startingBox) {
                 outlinebox = currentBox;
@@ -191,7 +191,7 @@ export async function makeBox(): Promise<Mesh> {
                 txtXposition.text = round2(currentBox.position.x) + ""
                 txtYposition.text = round2(currentBox.position.y) + ""
                 txtZposition.text = round2(currentBox.position.z) + ""
-                await handler.putPositionBox(currentBox.id, currentBox.x, currentBox.y, currentBox.z)
+                handler.putPositionBox(currentBox.id, currentBox.position.x, currentBox.position.y, currentBox.position.z)
                 listexportbox.isVisible = true;
                 txteditnamebox.text = currentBox.name.toString().replace("box","");
                 return;
@@ -218,7 +218,7 @@ export async function makeBox(): Promise<Mesh> {
 
     }
 
-    scene.onPointerObservable.add(async (pointerInfo) => {
+    scene.onPointerObservable.add((pointerInfo) => {
         switch (pointerInfo.type) {
             case PointerEventTypes.POINTERDOWN:
 
@@ -252,7 +252,7 @@ export async function makeBox(): Promise<Mesh> {
 
                 break;
             case PointerEventTypes.POINTERUP:
-                await pointerUp(pointerInfo.pickInfo.pickedMesh);
+                pointerUp(pointerInfo.pickInfo.pickedMesh);
                 break;
             case PointerEventTypes.POINTERMOVE:
                 pointerMove();
