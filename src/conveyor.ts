@@ -146,6 +146,7 @@ export async function makeConveyor(): Promise<Mesh> {
     // delete selected palletes
     btndelete.onPointerClickObservable.add(() => {
         if (currentConveyor != null) {
+            handler.deleteConveyor(currentConveyor.id)
             currentConveyor.dispose();
             currentConveyor = null;
         }

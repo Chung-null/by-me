@@ -192,6 +192,7 @@ export async function makeShelf(): Promise<Mesh> {
         }
     })
     btneditshelf.onPointerClickObservable.add(() => {
+        currentMesh.name = txteditnameshelf
         handler.putNameShelf(currentMesh.id, txteditnameshelf.text)
     })
     btncloseshelf.onPointerUpObservable.add(() => {
@@ -342,6 +343,7 @@ export async function makeShelf(): Promise<Mesh> {
     // delete selected meshes
     btndelete.onPointerClickObservable.add(() => {
         if (currentMesh != null) {
+            handler.deleteShelf(currentMesh.id)
             currentMesh.dispose();
             currentMesh = null;
         }

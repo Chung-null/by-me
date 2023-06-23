@@ -174,6 +174,7 @@ export async function makePallet(): Promise<Mesh> {
     // delete selected palletes
     btndelete.onPointerClickObservable.add(() => {
         if (currentPallet != null) {
+            handler.deletePallet(currentPallet.id)
             currentPallet.dispose();
             currentPallet = null;
         }
