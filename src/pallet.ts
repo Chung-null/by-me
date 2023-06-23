@@ -114,7 +114,7 @@ export async function makePallet(): Promise<Mesh> {
         }
 
     }
-    var pointerUp = function () {
+    var pointerUp = async function () {
         if (startingPallet) {
             // currentPallet.material.wireframe = false;
 
@@ -126,7 +126,7 @@ export async function makePallet(): Promise<Mesh> {
             gizmoManager.positionGizmoEnabled = true
             // Restrict gizmos to only spheres
             gizmoManager.attachableMeshes = startingPallet
-            handler.putPositionPallet(currentPallet.id, currentPallet.position.x, currentPallet.position.y, currentPallet.position.z)
+            await handler.putPositionPallet(currentPallet.id, currentPallet.x, currentPallet.y, currentPallet.z)
             return;
         }
     }
@@ -172,9 +172,9 @@ export async function makePallet(): Promise<Mesh> {
         }
     });
     // delete selected palletes
-    btndelete.onPointerClickObservable.add(() => {
+    btndelete.onPointerClickObservable.add(async () => {
         if (currentPallet != null) {
-            handler.deletePallet(currentPallet.id)
+            await handler.deletePallet(currentPallet.id)
             currentPallet.dispose();
             currentPallet = null;
         }

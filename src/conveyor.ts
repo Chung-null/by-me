@@ -102,13 +102,13 @@ export async function makeConveyor(): Promise<Mesh> {
         }
 
     }
-    var pointerUp = function () {
+    var pointerUp = async function () {
         if (startingConveyor) {
             outlineconveyor = currentConveyor;
             outlineconveyor.renderOutline = false;
             camera.attachControl(canvas, true);
             startingConveyor = null;
-            handler.putPositionConveyor(currentConveyor.id, currentConveyor.position.x, currentConveyor.position.y, currentConveyor.position.z)
+            await handler.putPositionConveyor(currentConveyor.id, currentConveyor.x, currentConveyor.y, currentConveyor.z)
             return;
         }
     }
@@ -144,9 +144,9 @@ export async function makeConveyor(): Promise<Mesh> {
         }
     });
     // delete selected palletes
-    btndelete.onPointerClickObservable.add(() => {
+    btndelete.onPointerClickObservable.add(async () => {
         if (currentConveyor != null) {
-            handler.deleteConveyor(currentConveyor.id)
+            await handler.deleteConveyor(currentConveyor.id)
             currentConveyor.dispose();
             currentConveyor = null;
         }

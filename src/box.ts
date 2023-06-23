@@ -115,11 +115,11 @@ export async function makeBox(): Promise<Mesh> {
         // You can perform additional actions with the created box if needed
     });
     btnexportbox.onPointerClickObservable.add(async () => {
-        handler.putExportBox(currentBox.id, getCurrentDate().toString())
+        await handler.putExportBox(currentBox.id, getCurrentDate().toString())
     })
     btneditnamebox.onPointerClickObservable.add(async () => {
         currentBox.name = txteditnamebox.text
-        handler.putNameBox(currentBox.id, txteditnamebox.text)
+        await handler.putNameBox(currentBox.id, txteditnamebox.text)
     })
     //Close ListMenuBox
     btnclosebox.onPointerUpObservable.add(() => {
