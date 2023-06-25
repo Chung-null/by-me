@@ -4,6 +4,8 @@ import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
 import { handlers } from './api/handlers';
+import { InputText } from '@babylonjs/gui';
+import { round2 } from './util';
 
 
 export async function makeConveyor(): Promise<Mesh> {
@@ -30,6 +32,11 @@ export async function makeConveyor(): Promise<Mesh> {
     listexportbox.isVisible = false;
     let listeditshelf = advancedTexture.getControlByName("ListEditShelf");
     listeditshelf.isVisible = false;
+
+    //Get Location Object
+    let txtXposition = <InputText>advancedTexture.getControlByName("InputTextX");
+    let txtYposition = <InputText>advancedTexture.getControlByName("InputTextY");
+    let txtZposition = <InputText>advancedTexture.getControlByName("InputTextZ");
     // handle API
     let handler = new handlers()
     async function syncConveyorFromDB() {
@@ -85,6 +92,10 @@ export async function makeConveyor(): Promise<Mesh> {
             // outlineconveyor
             outlineconveyor = currentConveyor;
             outlineconveyor.renderOutline = false;
+            location.isVisible = false
+            txtXposition.text = "";
+            txtYposition.text = "";
+            txtZposition.text = "";
         }
         // currentConveyor.material.wireframe = true;
         // outlineconveyor
@@ -108,7 +119,14 @@ export async function makeConveyor(): Promise<Mesh> {
             outlineconveyor.renderOutline = false;
             camera.attachControl(canvas, true);
             startingConveyor = null;
-            await handler.putPositionConveyor(currentConveyor.id, currentConveyor.position.x, currentConveyor.position.y, currentConveyor.position.z)
+            location.isVisible = true;
+            txtXposition.text = round2(currentConveyor.position.x) + ""
+            txtYposition.text = round2(currentConveyor.position.y) + ""
+            txtZposition.text = round2(currentConveyor.position.z) + ""
+            if (currentConveyor.id) {
+                let result = await handler.putPositionConveyor(currentConveyor.id, currentConveyor.position.x, currentConveyor.position.y, currentConveyor.position.z)
+                console.log(result)
+            }
             return;
         }
     }
@@ -133,6 +151,17 @@ export async function makeConveyor(): Promise<Mesh> {
 
                 if (pointerInfo.pickInfo.hit && pointerInfo.pickInfo.pickedMesh != ground) {
                     pointerDown(pointerInfo.pickInfo.pickedMesh)
+                }
+                else if (pointerInfo.pickInfo.pickedMesh == ground) {
+                    if (currentConveyor) {
+                        // outline
+                        outlineconveyor = currentConveyor;
+                        outlineconveyor.renderOutline = false;
+                        location.isVisible = false
+                        txtXposition.text = "";
+                        txtYposition.text = "";
+                        txtZposition.text = "";
+                    }
                 }
                 break;
             case PointerEventTypes.POINTERUP:

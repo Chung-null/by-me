@@ -4,6 +4,8 @@ import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
 import { handlers } from './api/handlers';
+import { round2 } from './util';
+import { InputText } from '@babylonjs/gui';
 
 export async function makeWare(): Promise<Mesh> {
     var startingWare;
@@ -29,12 +31,16 @@ export async function makeWare(): Promise<Mesh> {
     listexportbox.isVisible = false;
     let listeditshelf = advancedTexture.getControlByName("ListEditShelf");
     listeditshelf.isVisible = false;
+    //Get Location Object
+    let txtXposition = <InputText>advancedTexture.getControlByName("InputTextX");
+    let txtYposition = <InputText>advancedTexture.getControlByName("InputTextY");
+    let txtZposition = <InputText>advancedTexture.getControlByName("InputTextZ");
     // handle API
     let handler = new handlers()
     async function syncWarehouseFromDB() {
         let allWarehouseOnDB = await handler.get("warehouse")
         if (allWarehouseOnDB.status == 200) {
-            allWarehouseOnDB.content.forEach(async function(element){
+            allWarehouseOnDB.content.forEach(async function (element) {
                 if (wares.filter(ware => ware.id == element.id).length == 0) {// unique on array
                     let wareSync = await createWarehouse(element.id, new Vector3(element.x, element.y, element.z))
                     wares.push(wareSync)
@@ -56,7 +62,7 @@ export async function makeWare(): Promise<Mesh> {
 
     //Add Warehouse
     let buttonWarehouse = advancedTexture.getControlByName("ButtonWarehouse");
-    buttonWarehouse.onPointerClickObservable.add(async() => {
+    buttonWarehouse.onPointerClickObservable.add(async () => {
         let positionWarehouse = new Vector3()
         if (position != 1) {
             positionWarehouse.x += position;
@@ -87,6 +93,10 @@ export async function makeWare(): Promise<Mesh> {
             // outline
             outlineware = currentWare;
             outlineware.renderOutline = false;
+            location.isVisible = false
+            txtXposition.text = "";
+            txtYposition.text = "";
+            txtZposition.text = "";
         }
 
         currentWare = house;
@@ -113,7 +123,13 @@ export async function makeWare(): Promise<Mesh> {
             outlineware.renderOutline = false;
             camera.attachControl(canvas, true);
             startingWare = null;
-            await handler.putPositionWarehouse(currentWare.id, currentWare.position.x, currentWare.position.y, currentWare.position.z)
+            location.isVisible = true;
+            txtXposition.text = round2(currentWare.position.x) + ""
+            txtYposition.text = round2(currentWare.position.y) + ""
+            txtZposition.text = round2(currentWare.position.z) + ""
+            if (currentWare.id) {
+                await handler.putPositionWarehouse(currentWare.id, currentWare.position.x, currentWare.position.y, currentWare.position.z)
+            }
             return;
         }
     }
@@ -138,6 +154,17 @@ export async function makeWare(): Promise<Mesh> {
 
                 if (pointerInfo.pickInfo.hit && pointerInfo.pickInfo.pickedMesh != ground) {
                     pointerDown(pointerInfo.pickInfo.pickedMesh)
+                }
+                else if (pointerInfo.pickInfo.pickedMesh == ground) {
+                    if (currentWare) {
+                        // outline
+                        outlineware = currentWare;
+                        outlineware.renderOutline = false;
+                        location.isVisible = false
+                        txtXposition.text = "";
+                        txtYposition.text = "";
+                        txtZposition.text = "";
+                    }
                 }
                 break;
             case PointerEventTypes.POINTERUP:

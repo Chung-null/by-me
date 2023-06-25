@@ -4,6 +4,8 @@ import "@babylonjs/loaders";
 import * as GUI from "@babylonjs/gui";
 import { ground } from './ground';
 import { handlers } from './api/handlers';
+import { InputText } from '@babylonjs/gui';
+import { round2 } from './util';
 
 
 
@@ -33,6 +35,10 @@ export async function makePallet(): Promise<Mesh> {
     listexportbox.isVisible = false;
     let listeditshelf = advancedTexture.getControlByName("ListEditShelf");
     listeditshelf.isVisible = false;
+    //Get Location Object
+    let txtXposition = <InputText>advancedTexture.getControlByName("InputTextX");
+    let txtYposition = <InputText>advancedTexture.getControlByName("InputTextY");
+    let txtZposition = <InputText>advancedTexture.getControlByName("InputTextZ");
     // handle API
     let handler = new handlers()
 
@@ -41,7 +47,7 @@ export async function makePallet(): Promise<Mesh> {
         if (allPalletOnDB.status == 200) {
             allPalletOnDB.content.forEach(async function (element) {
                 if (palletes.filter(pallet => pallet.id == element.id).length == 0) {// unique on array
-                    let palletSync = await createPallet(element.id,new Vector3(element.x, element.y, element.z))
+                    let palletSync = await createPallet(element.id, new Vector3(element.x, element.y, element.z))
                     palletes.push(palletSync)
                 }
             });
@@ -91,6 +97,10 @@ export async function makePallet(): Promise<Mesh> {
             outlinepallet = currentPallet;
             outlinepallet.renderOutline = false;
             // gizmoManager.positionGizmoEnabled = false;
+            location.isVisible = false
+            txtXposition.text = "";
+            txtYposition.text = "";
+            txtZposition.text = "";
         }
 
         currentPallet = pallet;
@@ -122,7 +132,13 @@ export async function makePallet(): Promise<Mesh> {
             gizmoManager.positionGizmoEnabled = true
             // Restrict gizmos to only spheres
             gizmoManager.attachableMeshes = startingPallet
-            await handler.putPositionPallet(currentPallet.id, currentPallet.position.x, currentPallet.position.y, currentPallet.position.z)
+            location.isVisible = true;
+            txtXposition.text = round2(currentPallet.position.x) + ""
+            txtYposition.text = round2(currentPallet.position.y) + ""
+            txtZposition.text = round2(currentPallet.position.z) + ""
+            if (currentPallet.id) {
+                await handler.putPositionPallet(currentPallet.id, currentPallet.position.x, currentPallet.position.y, currentPallet.position.z)
+            }
             return;
         }
     }
@@ -155,6 +171,10 @@ export async function makePallet(): Promise<Mesh> {
                         outlinepallet = currentPallet;
                         outlinepallet.renderOutline = false;
                         gizmoManager.positionGizmoEnabled = false
+                        location.isVisible = false
+                        txtXposition.text = "";
+                        txtYposition.text = "";
+                        txtZposition.text = "";
                     }
                     // console.log("down");
                 }

@@ -89,16 +89,16 @@ export async function makeShelf(): Promise<Mesh> {
     let txtaddDepth = <InputText>advancedTexture.getControlByName("InputTextDepth");
     //Edit Shelf
     let txteditnameshelf = <InputText>advancedTexture.getControlByName("InputEditNameShelf");
-   
+
     // handle db 
     let handler = new handlers()
     var shelfMaterial = new StandardMaterial("shelfmat", scene);
     // Function to create a single shelf
     async function createShelf(offsetX, offsetY, offsetZ) {
-        const result = await SceneLoader.ImportMeshAsync(null, "shelf/","shelfeton1.obj",scene);
+        const result = await SceneLoader.ImportMeshAsync(null, "shelf/", "shelfeton1.obj", scene);
         const randomNumber = generateUniqueRandom(Number.MAX_SAFE_INTEGER)
 
-        
+
         mesh = result.meshes[0]
         console.log(result.meshes.length)
         mesh.position.x = offsetX;
@@ -118,11 +118,11 @@ export async function makeShelf(): Promise<Mesh> {
         let addNameShelf = txtNameInfo.text
         if (addRow < 1 || addColumn < 1 || addDepth < 1 || addWeightShelf < 1) {
             alert("Các chỉ số của kệ hàng không được bỏ trống và không thể nhỏ hơn 1!")
-            return 
+            return
         }
         if (addNameShelf.trim() == "") {
             alert("Tên kệ hàng không được bỏ trống!")
-            return 
+            return
         }
         let resultPost = await handler.postShelf(addNameShelf, addWeightShelf, addColumn, addRow, addDepth, offsetX, offsetY, offsetZ)
         if (resultPost.status == 201) {
@@ -156,7 +156,7 @@ export async function makeShelf(): Promise<Mesh> {
 
             var groupMesh = Mesh.MergeMeshes(meshesInShelf);
             groupMesh.name = "shelf" + name
-            groupMesh.id = id 
+            groupMesh.id = id
             return groupMesh
         }
         return new Mesh("")
@@ -164,7 +164,7 @@ export async function makeShelf(): Promise<Mesh> {
     async function syncShelfFromDB() {
         let allShelfOnDB = await handler.get("shelf")
         if (allShelfOnDB.status == 200) {
-            allShelfOnDB.content.forEach(async function(element){
+            allShelfOnDB.content.forEach(async function (element) {
                 if (shelf.filter(_shelf => _shelf.id == element.id).length == 0) {// unique on array
                     let shelfSync = await importShelf(element.id, element.name, element.field_rows, element.field_columns, element.field_depth, element.x, element.y, element.z)
                     if (shelfSync.name != "") {
@@ -187,7 +187,7 @@ export async function makeShelf(): Promise<Mesh> {
         try {
             createCompleteShelf()
         }
-        catch(e) {
+        catch (e) {
             alert("Có lỗi xảy ra! Có thể nguyên nhân là do bạn để trống thuộc tính nào đó")
         }
     })
@@ -223,7 +223,7 @@ export async function makeShelf(): Promise<Mesh> {
 
                         listeditshelf.isVisible = false;
                         txteditnameshelf.text = "";
-                    
+
 
                     }
 
@@ -269,7 +269,9 @@ export async function makeShelf(): Promise<Mesh> {
 
                 listeditshelf.isVisible = true;
                 txteditnameshelf.text = currentMesh.name.toString()
-                await handler.putPositionShelf(currentMesh.id, currentMesh.position.x, currentMesh.position.y, currentMesh.position.z)
+                if (currentMesh.id) {
+                    await handler.putPositionShelf(currentMesh.id, currentMesh.position.x, currentMesh.position.y, currentMesh.position.z)
+                }
                 //camera.attachControl(canvas, true);
                 startingPoint = null;
 
